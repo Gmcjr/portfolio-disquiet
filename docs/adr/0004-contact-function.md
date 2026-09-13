@@ -17,20 +17,20 @@ seam — `handleContact(req, deps)` — wrapped by a three-line Vercel adapter t
 real dependencies (`sendEmail`, `now`, `timeoutMs`, `env`, `log`). Pipeline, in order, one
 failure response per step:
 
-| Step | Check | Failure |
-|---|---|---|
-| 0 | Method is `POST` | 405 `method-not-allowed` |
-| 1 | `Content-Type: application/json` | 415 `unsupported-media-type` |
-| 2 | Body ≤ 16 KB | 413 `payload-too-large` |
-| 3 | Valid JSON | 400 `invalid-json` |
-| 4 | `Origin` header in the allow-list (`SITE_URL`; `*.vercel.app`/`VERCEL_URL` on preview; `localhost` outside production) | 403 `origin-not-allowed` |
-| 5 | Shared Zod schema (`src/lib/contact-schema.ts`) validates | 422 `validation-failed` + field-level `errors` |
-| 6 | Log `contact.received` (no PII) | — |
-| 7 | Honeypot field empty | **fake 200** `{ok:true}` — bots never learn they were caught |
-| 8 | `elapsedMs >= 1000` | **visible 422** `submitted-too-fast` — never a fake success |
-| 9 | *(reserved: a future KV rate-limit would insert here)* | — |
-| 10 | Send via Resend, 10s timeout | 503 (quota/rate-limited), 500 (misconfiguration), or 502 (any other failure/timeout) |
-| 11 | Respond | 200 `{ok:true}`, log `contact.sent` |
+| Step | Check                                                                                                                  | Failure                                                                              |
+| ---- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| 0    | Method is `POST`                                                                                                       | 405 `method-not-allowed`                                                             |
+| 1    | `Content-Type: application/json`                                                                                       | 415 `unsupported-media-type`                                                         |
+| 2    | Body ≤ 16 KB                                                                                                           | 413 `payload-too-large`                                                              |
+| 3    | Valid JSON                                                                                                             | 400 `invalid-json`                                                                   |
+| 4    | `Origin` header in the allow-list (`SITE_URL`; `*.vercel.app`/`VERCEL_URL` on preview; `localhost` outside production) | 403 `origin-not-allowed`                                                             |
+| 5    | Shared Zod schema (`src/lib/contact-schema.ts`) validates                                                              | 422 `validation-failed` + field-level `errors`                                       |
+| 6    | Log `contact.received` (no PII)                                                                                        | —                                                                                    |
+| 7    | Honeypot field empty                                                                                                   | **fake 200** `{ok:true}` — bots never learn they were caught                         |
+| 8    | `elapsedMs >= 1000`                                                                                                    | **visible 422** `submitted-too-fast` — never a fake success                          |
+| 9    | _(reserved: a future KV rate-limit would insert here)_                                                                 | —                                                                                    |
+| 10   | Send via Resend, 10s timeout                                                                                           | 503 (quota/rate-limited), 500 (misconfiguration), or 502 (any other failure/timeout) |
+| 11   | Respond                                                                                                                | 200 `{ok:true}`, log `contact.sent`                                                  |
 
 Every non-2xx response is RFC 9457 `application/problem+json`. The email body is plain text
 only — no HTML template, no injection surface. `replyTo` is the bare submitted address, never

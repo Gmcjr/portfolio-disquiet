@@ -25,7 +25,7 @@ Three tiers in `src/styles/global.css`:
 1. **Primitives**, in `@theme static { }` — raw values, no assigned meaning (`--color-paper-0`,
    `--color-ink-900`, the type scale, spacing keys, radii, shadows, easings, durations).
 2. **Semantic tokens**, in `@layer base` on `:root { }` and `[data-theme="dark"] { }` — each
-   `= var(<primitive>)`. Components reference *these*, never a primitive directly:
+   `= var(<primitive>)`. Components reference _these_, never a primitive directly:
    `--color-bg`, `--color-surface`, `--color-text`, `--color-text-muted`, `--color-border`,
    `--color-accent` (decoration only), `--color-focus`, `--color-danger`, `--color-success`.
 3. **`@theme inline { }`** re-exposes the semantic names as Tailwind utilities (`bg-bg`,

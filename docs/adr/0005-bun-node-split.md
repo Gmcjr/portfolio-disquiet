@@ -7,7 +7,7 @@
 
 Bun was a fixed constraint the user wanted to try (`CONTEXT.md` §11). Vercel offers two
 distinct things that both get called "Bun on Vercel": Bun as the package manager / build tool,
-and a separate Bun *function* runtime that is public beta and gives up automatic source maps
+and a separate Bun _function_ runtime that is public beta and gives up automatic source maps
 and some request metrics.
 
 ## Decision

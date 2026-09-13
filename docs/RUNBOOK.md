@@ -5,11 +5,11 @@ Operational reference: deploying, verifying, and recovering. Not a design docume
 
 ## Environments
 
-| Env | Trigger | Notes |
-|---|---|---|
-| Local | `bun run dev` (site only) or `vercel dev` (site + function, one origin) | `vercel dev` is required to exercise the contact form — same-origin `Origin` check needs it |
-| Preview | any pull request | needs its own env vars, see below — without them the form 500s |
-| Production | push to `main` | Vercel git integration, no separate deploy step |
+| Env        | Trigger                                                                 | Notes                                                                                       |
+| ---------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Local      | `bun run dev` (site only) or `vercel dev` (site + function, one origin) | `vercel dev` is required to exercise the contact form — same-origin `Origin` check needs it |
+| Preview    | any pull request                                                        | needs its own env vars, see below — without them the form 500s                              |
+| Production | push to `main`                                                          | Vercel git integration, no separate deploy step                                             |
 
 ## Environment variables
 
@@ -17,7 +17,7 @@ Operational reference: deploying, verifying, and recovering. Not a design docume
 `.env` content directly (blocked by a hook in `.claude/settings.json`); if a value is genuinely
 needed, get it from the Vercel dashboard.
 
-**Preview-scoped values matter**: use a Resend *test* API key, `CONTACT_FROM =
+**Preview-scoped values matter**: use a Resend _test_ API key, `CONTACT_FROM =
 onboarding@resend.dev`, and `CONTACT_TO` = the Resend account owner's own address — Resend's
 test mode only delivers there. If `CONTACT_TO` in preview is set to the real destination alias,
 preview submissions will silently never arrive.
@@ -25,7 +25,7 @@ preview submissions will silently never arrive.
 ## Post-deploy smoke test
 
 Run after any production deploy that touched routing, the contact form, SEO, or config. Also
-run once against the *first preview deploy* of the project (item 2 below especially — a
+run once against the _first preview deploy_ of the project (item 2 below especially — a
 soft-200 instead of a real 404 forces a `vercel.json` routing rule, better caught early).
 
 1. `/`, `/work`, `/work/<a real slug>`, `/about`, `/contact`, `/privacy` all return 200 and

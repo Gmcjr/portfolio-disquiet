@@ -28,16 +28,16 @@ Testing the contact function locally needs the Vercel CLI (`vercel link` once, t
 
 ## Scripts
 
-| Command | Does |
-|---|---|
-| `bun run dev` | Astro dev server |
-| `bun run build` | Production build to `dist/` |
-| `bun run preview` | Serve the built output locally |
-| `bun run typecheck` | `astro check` + `tsc --noEmit` |
-| `bun run lint` / `lint:fix` | ESLint |
-| `bun run format` / `format:check` | Prettier |
-| `bun run depcruise` | Module-boundary and import-cycle check |
-| `bun run test` | Vitest |
+| Command                           | Does                                   |
+| --------------------------------- | -------------------------------------- |
+| `bun run dev`                     | Astro dev server                       |
+| `bun run build`                   | Production build to `dist/`            |
+| `bun run preview`                 | Serve the built output locally         |
+| `bun run typecheck`               | `astro check` + `tsc --noEmit`         |
+| `bun run lint` / `lint:fix`       | ESLint                                 |
+| `bun run format` / `format:check` | Prettier                               |
+| `bun run depcruise`               | Module-boundary and import-cycle check |
+| `bun run test`                    | Vitest                                 |
 
 ## Working in this repo with Claude Code
 

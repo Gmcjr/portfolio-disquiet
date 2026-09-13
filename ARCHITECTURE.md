@@ -57,7 +57,7 @@ Three layers, dependencies point one way only, enforced in CI by `dependency-cru
 `src/lib/contact-schema.ts` and other pure `src/lib/` helpers — never `src/lib/content`, never
 UI, never `src/config`. It reads its own environment independently (ADR-0004, ADR-0005).
 
-**Content layer** (`src/lib/content/index.ts`) is the *only* place anything reads
+**Content layer** (`src/lib/content/index.ts`) is the _only_ place anything reads
 `astro:content`. It exports `getPublished<C>(collection, includeDrafts)`, `getAllWork()`,
 `getWorkBySlug(slug)`, `getFeaturedWork()` — all draft-aware, all sorted newest-first. No page
 or component calls `astro:content` directly. See ADR-0002.
@@ -95,7 +95,7 @@ Full step-by-step and the complete `problem+json` catalog: ADR-0004.
 Public GitHub repo → Vercel git integration. Push to `main` → production deploy. Any PR →
 preview deploy. Bun installs and builds (`bun.lock` committed); the one function runs on
 Node 24.x — a different runtime from the build, deliberately (ADR-0005). No `vercel.json`
-adapter is needed for the static output; a `vercel.json` *is* present for security headers
+adapter is needed for the static output; a `vercel.json` _is_ present for security headers
 (section 8) and, if needed, a routing rule for the reserved 404 sections.
 
 ## 7. Cross-cutting concepts

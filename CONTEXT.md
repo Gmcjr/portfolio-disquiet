@@ -50,7 +50,7 @@ deferred — not a v1 commitment, a stretch idea for later.
 ## 8. Team size and existing skills
 
 Solo. Comfortable with TypeScript and React. Wants to keep practicing both — but that practice
-happens on *other* projects. This site's job is performance, visual craft, and converting
+happens on _other_ projects. This site's job is performance, visual craft, and converting
 visitors into interviews, which is why v1 ships zero React (see ADR-0001). Wanted to try Bun
 and TailwindCSS here. Wants to understand every line of code shipped, not just receive it —
 see the build posture in `CLAUDE.md`.
