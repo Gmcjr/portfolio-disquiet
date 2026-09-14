@@ -1,0 +1,56 @@
+@import 'tailwindcss';
+
+/* ------------------------------------------------------------------------
+  - Design tokens: three tiers, see STYLEGUIDE.md
+    1. Primitives (@theme static): raw values, no assigned meaning yet.
+    2. Semantic tokens (@layer base): what components reference.
+    3. @theme inline: re-exposes semantics as Tailwind utilities (bg-bg, etc.)
+      so they resolve to the live value and flip correctly under [data-theme].
+    - Values below are placeholders. Will decide on the real palette, type scale, and motion tokens later. This file is just to get it working, not final design.
+  --------------------------------------------------------------------------
+*/
+
+@theme static {
+  --color-paper-0: #fbf9f5
+  --color-ink-900: #1a1918
+  --color-night-0: #131311
+  --color-ink-50: #ece7dd
+}
+
+@layer base {
+  :root {
+    --color-bg: var(--color-paper-0);
+    --color-text: var(--color-ink-900);
+  }
+
+  [data-theme='dark'] {
+    --color-bg: var(--color-night-0);
+    --color-text: var(--color-ink-50);
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-text);
+    outline-offset: 2px;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--color-bg);
+  --color-text: var(--color-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
