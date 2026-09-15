@@ -7,6 +7,10 @@ pre-commit:
       glob: '*.{astro,ts,tsx,js,mjs,cjs,json,md,mdx,css,yml,yaml}'
       run: bunx prettier --write {staged_files}
       stage_fixed: true
+    lint:
+      glob: '*.{astro,ts,tsx,js,mjs,cjs}'
+      run: bunx eslint --fix --max-warnings=0 {staged_files}
+      stage_fixed: true
 
 pre-push:
   parallel: true

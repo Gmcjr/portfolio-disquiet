@@ -4,7 +4,7 @@ export const SITE_NAME = 'Disquiet';
 export const SITE_DESCRIPTION =
   'Developer portfolio - case studies, and eventually music and visual art.';
 
-export const CONTACT_EMAIL = "hello@disquiet.dev"; // Placeholder
+export const CONTACT_EMAIL = 'hello@disquiet.dev'; // Placeholder
 
 export const GOATCOUNTER_ENDPOINT = 'https://disquiet.goatcounter.com/count'; // Placeholder
 
