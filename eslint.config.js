@@ -18,6 +18,10 @@ export default tseslint.config(
       },
     },
   },
+  {
+    files: ['*.config.ts'],
+    extends: [...tseslint.configs.recommended],
+  },
   ...astro.configs['flat/recommended'],
-  eslintConfigPrettier
+  eslintConfigPrettier,
 );
