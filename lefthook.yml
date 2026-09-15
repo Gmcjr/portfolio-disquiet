@@ -3,15 +3,15 @@
 pre-commit:
   parallel: true
   commands:
-  format:
-  glob: '*.{astro,ts,tsx,js,mjs,cjs,json,md,mdx,css,yml,yaml}'
-  run: bunx prettier --write {staged_files}
-  stage_fixed: true
+    format:
+      glob: '*.{astro,ts,tsx,js,mjs,cjs,json,md,mdx,css,yml,yaml}'
+      run: bunx prettier --write {staged_files}
+      stage_fixed: true
 
 pre-push:
-parallel: true
-commands:
-  typecheck:
-    run: bun run typecheck
-  depcruise:
-    run: bun run depcruise
+  parallel: true
+  commands:
+    typecheck:
+      run: bun run typecheck
+    depcruise:
+      run: bun run depcruise
