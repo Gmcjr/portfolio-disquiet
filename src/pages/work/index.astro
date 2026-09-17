@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getAllWork } from '../../lib/content';
+
+const work = await getAllWork(import.meta.env.DEV);
+---
+
+<BaseLayout title="Work - Disquiet">
+  <main>
+    <h1>Work</h1>
+    <ul>
+      {work.map((entry) => (
+        <li>
+          <a href={`/work/${entry.id}`}>{entry.data.title}</a>
+          <p>{entry.data.summary}</p>
+        </li>
+      ))}
+    </ul>
+  </main>
+</BaseLayout>
