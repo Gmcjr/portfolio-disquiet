@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getAllWork } from '../../lib/content';
+import { render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const entries = await getAllWork(import.meta.env.DEV);
+  return entries.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'work'>;
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<BaseLayout title={`${entry.data.title} - Disquiet`}>
+  <main>
+    <h1>{entry.data.title}</h1>
+    <p>
+      {entry.data.role} • {entry.data.year}
+    </p>
+    <article>
+      <Content />
+    </article>
+  </main>
+</BaseLayout>
