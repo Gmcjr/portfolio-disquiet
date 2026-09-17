@@ -1,4 +1,5 @@
-import { defineCollection, z, type SchemaContext } from 'astro:content';
+import { defineCollection, type SchemaContext } from 'astro:content';
+import { z } from 'zod';
 import { glob } from 'astro/loaders';
 
 const base = ({ image }: SchemaContext) =>

@@ -11,10 +11,8 @@
 */
 
 @theme static {
-  --color-paper-0: #fbf9f5
-  --color-ink-900: #1a1918
-  --color-night-0: #131311
-  --color-ink-50: #ece7dd
+  --color-paper-0: #fbf9f5 --color-ink-900: #1a1918 --color-night-0: #131311
+    --color-ink-50: #ece7dd;
 }
 
 @layer base {
