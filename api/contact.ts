@@ -1,6 +1,6 @@
 import { Resend } from 'resend';
-import { contactSchema, type ContactInput } from '../src/lib/contact-schema';
-import { env } from './_env';
+import { contactSchema, type ContactInput } from '../src/lib/contact-schema.js';
+import { env } from './_env.js';
 
 const BODY_SIZE_LIMIT = 16384;
 const TIMING_FLOOR_MS = 1000;
