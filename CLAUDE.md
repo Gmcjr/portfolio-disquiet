@@ -51,6 +51,8 @@ plan).
 - Before writing a new file, cross-check `ARCHITECTURE.md` and the relevant ADR in full for
   every requirement that file must meet. Do not rely on partial recall — re-read the source,
   every time, not just on the first pass at a feature.
+- Code comments use the `plain-human-writing` skill's register: short, plain, active-voice
+  sentences, no AI-writing tells. Apply it to every comment, not just narrative prose.
 
 ## Communication style
 

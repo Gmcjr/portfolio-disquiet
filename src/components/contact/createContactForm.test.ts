@@ -21,6 +21,9 @@ function mountForm(): HTMLElement {
         <p data-error-text></p>
         <a data-mailto-link href="mailto:hello@disquiet.dev">Email me</a>
       </div>
+      <div data-error-summary hidden tabindex="-1">
+        <ul data-error-summary-list></ul>
+      </div>
     </div>
   `;
   return document.getElementById('root')!;
@@ -115,6 +118,64 @@ describe('createContactForm', () => {
 
     const emailError = root.querySelector('[data-error-for="email"]')!;
     expect(emailError.textContent).not.toBe('');
+  });
+
+  it('shows an error summary with one entry per bad field', async () => {
+    const problem = {
+      type: 'https://disquiet.dev/problems/validation-failed',
+      title: 'Validation failed',
+      status: 422,
+      detail: 'One or more fields are invalid.',
+      errors: [
+        { field: 'name', code: 'too_small' },
+        { field: 'email', code: 'invalid_string' },
+      ],
+    };
+    const fakeFetch = vi
+      .fn()
+      .mockResolvedValue(
+        new Response(JSON.stringify(problem), { status: 422 }),
+      );
+    createContactForm(root, {
+      now: () => 2000,
+      fetch: fakeFetch as typeof fetch,
+    });
+    fillValidForm(root);
+    await submit(root);
+
+    const summary = root.querySelector<HTMLElement>('[data-error-summary]')!;
+    const links = summary.querySelectorAll('[data-error-summary-link]');
+    expect(summary.hidden).toBe(false);
+    expect(links).toHaveLength(2);
+  });
+
+  it('moves focus to the matching field when a summary link is clicked', async () => {
+    const problem = {
+      type: 'https://disquiet.dev/problems/validation-failed',
+      title: 'Validation failed',
+      status: 422,
+      detail: 'One or more fields are invalid.',
+      errors: [{ field: 'email', code: 'invalid_string' }],
+    };
+    const fakeFetch = vi
+      .fn()
+      .mockResolvedValue(
+        new Response(JSON.stringify(problem), { status: 422 }),
+      );
+    createContactForm(root, {
+      now: () => 2000,
+      fetch: fakeFetch as typeof fetch,
+    });
+    fillValidForm(root);
+    await submit(root);
+
+    const link = root.querySelector<HTMLButtonElement>(
+      '[data-error-summary-link="email"]',
+    )!;
+    link.click();
+
+    const emailInput = root.querySelector('[name="email"]');
+    expect(document.activeElement).toBe(emailInput);
   });
 
   it('shows the too-fast message without touching field errors', async () => {

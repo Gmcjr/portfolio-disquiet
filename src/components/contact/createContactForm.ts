@@ -15,6 +15,9 @@
 //   <div data-status role="status"></div>   (the success message)
 //   <div data-error-banner></div>   (a send failure, plus a mailto link)
 //   <a data-mailto-link></a>        (inside the error banner)
+//   <div data-error-summary>        (shown on a failed field validation)
+//     <ul data-error-summary-list></ul>
+//   </div>
 //
 // The page must still work with no JavaScript at all. This script only
 // upgrades a form that already renders; it does not create the form.
@@ -42,6 +45,12 @@ interface ProblemDetails {
 
 const FIELD_NAMES = ['name', 'email', 'message'] as const;
 type FieldName = (typeof FIELD_NAMES)[number];
+
+const FIELD_LABELS: Record<FieldName, string> = {
+  name: 'Name',
+  email: 'Email',
+  message: 'Message',
+};
 
 function isFieldName(value: string): value is FieldName {
   return (FIELD_NAMES as readonly string[]).includes(value);
@@ -84,6 +93,12 @@ export function createContactForm(
   const errorBannerEl = root.querySelector<HTMLElement>('[data-error-banner]');
   const mailtoLinkEl =
     root.querySelector<HTMLAnchorElement>('[data-mailto-link]');
+  const errorSummaryEl = root.querySelector<HTMLElement>(
+    '[data-error-summary]',
+  );
+  const errorSummaryListEl = root.querySelector<HTMLElement>(
+    '[data-error-summary-list]',
+  );
 
   const fieldInputs: Record<FieldName, HTMLInputElement | HTMLTextAreaElement> =
     {
@@ -116,6 +131,23 @@ export function createContactForm(
       const message = fieldErrors[fieldName];
       input.setAttribute('aria-invalid', String(Boolean(message)));
       if (errorEl) errorEl.textContent = message ?? '';
+    }
+
+    if (errorSummaryEl && errorSummaryListEl) {
+      const erroringFields = FIELD_NAMES.filter((name) => fieldErrors[name]);
+      errorSummaryEl.hidden = erroringFields.length === 0;
+      while (errorSummaryListEl.firstChild) {
+        errorSummaryListEl.removeChild(errorSummaryListEl.firstChild);
+      }
+      for (const fieldName of erroringFields) {
+        const item = document.createElement('li');
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.dataset.errorSummaryLink = fieldName;
+        button.textContent = `${FIELD_LABELS[fieldName]}: ${fieldErrors[fieldName]}`;
+        item.appendChild(button);
+        errorSummaryListEl.appendChild(item);
+      }
     }
 
     if (formErrorEl) {
@@ -163,6 +195,23 @@ export function createContactForm(
     return fieldErrors;
   }
 
+  function focusErrorSummary(): void {
+    errorSummaryEl?.focus();
+  }
+
+  errorSummaryListEl?.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    const button = target.closest<HTMLButtonElement>(
+      '[data-error-summary-link]',
+    );
+    if (!button) return;
+    const fieldName = button.dataset.errorSummaryLink;
+    if (fieldName && isFieldName(fieldName)) {
+      fieldInputs[fieldName].focus();
+    }
+  });
+
   form.addEventListener('submit', (event) => {
     event.preventDefault();
     void handleSubmit();
@@ -189,6 +238,7 @@ export function createContactForm(
         fieldErrors: extractFieldErrors(parsed.error.issues),
       });
       render();
+      focusErrorSummary();
       return;
     }
 
@@ -240,6 +290,9 @@ export function createContactForm(
     }
 
     render();
+    if (state.status === 'idle' && Object.keys(state.fieldErrors).length > 0) {
+      focusErrorSummary();
+    }
   }
 
   for (const fieldName of FIELD_NAMES) {

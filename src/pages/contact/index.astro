@@ -1,0 +1,149 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { CONTACT_EMAIL } from '../../config/site';
+---
+
+<BaseLayout title="Contact — Disquiet">
+  <main>
+    <h1>Contact</h1>
+    <p>
+      Have a project, a question, or just want to say hello? Send a message
+      below.
+    </p>
+
+    <div id="contact-form">
+      <div data-error-summary hidden tabindex="-1" aria-live="polite">
+        <p>Please fix the following before sending:</p>
+        <ul data-error-summary-list></ul>
+      </div>
+
+      <form novalidate>
+        <div>
+          <label for="name">
+            Name <span aria-hidden="true">(required)</span>
+          </label>
+          <input
+            id="name"
+            name="name"
+            type="text"
+            required
+            maxlength="100"
+            aria-describedby="name-error"
+          />
+          <p id="name-error" data-error-for="name" role="alert"></p>
+        </div>
+
+        <div>
+          <label for="email">
+            Email <span aria-hidden="true">(required)</span>
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            maxlength="254"
+            aria-describedby="email-error"
+          />
+          <p id="email-error" data-error-for="email" role="alert"></p>
+        </div>
+
+        <div>
+          <label for="message">
+            Message <span aria-hidden="true">(required)</span>
+          </label>
+          <textarea
+            id="message"
+            name="message"
+            required
+            maxlength="2000"
+            aria-describedby="message-error"
+          ></textarea>
+          <p id="message-error" data-error-for="message" role="alert"></p>
+        </div>
+
+        <!--
+          Honeypot field. A real visitor never sees or fills this in — it
+          sits off-screen, not display:none, because some bots skip fields
+          hidden that way but still fill in ones that are merely positioned
+          off-screen. aria-hidden and tabindex="-1" keep it out of the way
+          for screen readers and keyboard users too.
+        -->
+        <div class="honeypot-field">
+          <label for="_gotcha">Leave this field empty</label>
+          <input
+            id="_gotcha"
+            name="_gotcha"
+            type="text"
+            tabindex="-1"
+            autocomplete="off"
+            aria-hidden="true"
+          />
+        </div>
+
+        <p data-form-error role="alert"></p>
+
+        <p class="privacy-note">
+          When you submit this form, your name, email address, and message are
+          sent to me by email through Resend, a third-party email provider
+          (US-based). Resend processes and retains the message for up to 30 days
+          to deliver it. I don't store your message in any database or use it
+          for anything other than replying to you.
+        </p>
+
+        <button type="submit">Send message</button>
+      </form>
+
+      <div data-status role="status"></div>
+
+      <div data-error-banner hidden>
+        <p data-error-text></p>
+        <p>
+          Prefer email? Write to
+          <a data-mailto-link href={`mailto:${CONTACT_EMAIL}`}>
+            {CONTACT_EMAIL}
+          </a>
+          .
+        </p>
+      </div>
+    </div>
+
+    <p>
+      Prefer email? Write to{' '}
+      <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+    </p>
+
+    <noscript>
+      <p>
+        This form needs JavaScript to send. Please email me directly at
+        <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+      </p>
+    </noscript>
+  </main>
+
+  <script>
+    import { createContactForm } from '../../components/contact/createContactForm';
+
+    const root = document.getElementById('contact-form');
+    if (root) {
+      createContactForm(root, {
+        now: () => performance.now(),
+        fetch: window.fetch.bind(window),
+      });
+    }
+  </script>
+  <style>
+    /*
+      This is a functional/security utility. Its one job is to put the honeypot field where a sighted user will never see
+      it, without using display:none. Once design tokens exist
+      (Phase 6), this may move into a shared utility class.
+    */
+    .honeypot-field {
+      position: absolute;
+      left: -9999px;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+    }
+  </style>
+</BaseLayout>
