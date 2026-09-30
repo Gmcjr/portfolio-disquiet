@@ -19,7 +19,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['*.config.ts'],
+    files: ['*.config.ts', '*.setup.ts'],
     extends: [...tseslint.configs.recommended],
   },
   ...astro.configs['flat/recommended'],
