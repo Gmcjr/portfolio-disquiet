@@ -48,6 +48,9 @@ plan).
   intentional, not an oversight.
 - Before committing to a change with a real design tradeoff, call `advisor()` first — standing
   rule, not optional.
+- Before writing a new file, cross-check `ARCHITECTURE.md` and the relevant ADR in full for
+  every requirement that file must meet. Do not rely on partial recall — re-read the source,
+  every time, not just on the first pass at a feature.
 
 ## Communication style
 

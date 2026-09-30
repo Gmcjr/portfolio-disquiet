@@ -9,7 +9,7 @@ export default tseslint.config(
   },
   js.configs.recommended,
   {
-    files: ['src/**/*.{ts,tsx}', 'astro.config.ts'],
+    files: ['src/**/*.{ts,tsx}', 'astro.config.ts', 'api/**/*.ts'],
     extends: [...tseslint.configs.recommendedTypeChecked],
     languageOptions: {
       parserOptions: {
