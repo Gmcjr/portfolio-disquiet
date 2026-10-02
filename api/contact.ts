@@ -203,7 +203,7 @@ export async function handleContact(
   // Step 9 (reserved): Insert future KV rate-limiter here. See ADR-0004
 
   const start = deps.now();
-  const outcome = await Promise.race([
+  const outcome = await Promise.race<SendEmailResult | 'timeout'>([
     deps.sendEmail(input),
     new Promise<'timeout'>((resolve) =>
       setTimeout(() => resolve('timeout'), deps.timeoutMs),
