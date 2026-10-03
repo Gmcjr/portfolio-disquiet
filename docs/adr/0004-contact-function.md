@@ -55,6 +55,28 @@ legitimately submit in under two seconds — a fake success there would silently
 message this site exists to receive. The timing check now returns a visible, retriable 422
 instead.
 
+**Correction, 2026-10-03:** the function initially exported a bare default function,
+`export default function handler(req: Request): Promise<Response>`. Vercel's Node runtime did
+not treat this as a Web Standard handler — it fell back to its older `(request, response)`
+convention, passing a plain enhanced `IncomingMessage`-style object instead of a real `Request`.
+Every call crashed with `TypeError: req.headers.get is not a function`, confirmed directly
+against the deployed function's runtime logs. The export must be the documented Web Handler
+form instead:
+
+```ts
+export default {
+  fetch(request: Request): Promise<Response> {
+    return handleContact(request, { ...real deps... });
+  },
+};
+```
+
+This is the one export shape Vercel's docs confirm actually receives a real `Request` object
+with a working `.headers.get()`. A named `export function POST(request: Request)` would also
+work, but was rejected here: Vercel's own routing would then intercept every non-POST method
+before `handleContact` ever ran, making this ADR's own method-check (step 0, and its unit test)
+dead code.
+
 ## Consequences
 
 **Easy:** every branch is unit-testable by constructing a `Request` and fake `deps` — no
