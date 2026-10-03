@@ -300,16 +300,18 @@ function log(event: string, fields: Record<string, unknown>): void {
   );
 }
 
-export default function handler(req: Request): Promise<Response> {
-  return handleContact(req, {
-    sendEmail,
-    now: () => Date.now(),
-    timeoutMs: 10_000,
-    env: {
-      SITE_URL: env.SITE_URL,
-      VERCEL_ENV: process.env.VERCEL_ENV,
-      VERCEL_URL: process.env.VERCEL_URL,
-    },
-    log,
-  });
-}
+export default {
+  fetch(request: Request): Promise<Response> {
+    return handleContact(request, {
+      sendEmail,
+      now: () => Date.now(),
+      timeoutMs: 10_000,
+      env: {
+        SITE_URL: env.SITE_URL,
+        VERCEL_ENV: process.env.VERCEL_ENV,
+        VERCEL_URL: process.env.VERCEL_URL,
+      },
+      log,
+    });
+  },
+};
