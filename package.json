@@ -16,7 +16,8 @@
     "format:check": "prettier --check .",
     "depcruise": "depcruise src api --config",
     "test": "vitest run",
-    "prepare": "lefthook install"
+    "prepare": "lefthook install",
+    "guard:secrets": "grep -R \"RESEND_API_KEY\" -n src public && echo \"Secret found\" && exit 1 || exit 0"
   },
   "dependencies": {
     "@astrojs/mdx": "8.0.1",
@@ -25,7 +26,9 @@
     "astro": "7.3.2",
     "resend": "6.28.0",
     "tailwindcss": "4.3.3",
-    "zod": "4.6.4"
+    "zod": "4.6.4",
+    "tone": "14.9.0",
+    "p5": "1.10.0"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",
@@ -40,6 +43,7 @@
     "lefthook": "2.1.12",
     "prettier": "3.9.6",
     "prettier-plugin-astro": "1.0.0",
+    "sonda": "^0.14.0",
     "typescript": "6.0.3",
     "typescript-eslint": "8.70.0",
     "vitest": "5.0.0"

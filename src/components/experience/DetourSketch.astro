@@ -1,0 +1,43 @@
+---
+---
+
+<div id="sketchContainer" class="w-full h-64 bg-gray-200"></div>
+
+<script>
+  import { seedStore } from '@/lib/experience/store';
+  import { deriveTokens } from '@/lib/experience/seed';
+  // p5 is loaded dynamically because it is heavy and not needed on the server
+  import('p5').then((p5Module) => {
+    const p5 = p5Module.default;
+    const init = () => {
+      const seed = seedStore.get();
+      if (!seed) return;
+      const { sketch } = deriveTokens(seed);
+      new p5((p) => {
+        p.setup = () => {
+          const cnv = p.createCanvas(p.windowWidth, 200);
+          cnv.parent('sketchContainer');
+          p.noLoop();
+        };
+        p.draw = () => {
+          p.background(`hsl(${sketch.bgHue},30%,90%)`);
+          for (let i = 0; i < sketch.shapeCount; i++) {
+            p.fill(`hsla(${(sketch.bgHue + i * 30) % 360},70%,50%,0.6)`);
+            p.ellipse(
+              p.random(p.width),
+              p.random(p.height),
+              p.random(30, 80),
+              p.random(30, 80),
+            );
+          }
+        };
+      });
+    };
+    // Run after DOM is ready
+    if (document.readyState === 'complete') {
+      init();
+    } else {
+      window.addEventListener('load', init);
+    }
+  });
+</script>

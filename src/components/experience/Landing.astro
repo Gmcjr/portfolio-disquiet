@@ -1,0 +1,89 @@
+---
+---
+
+<div
+  class="flex flex-col items-center justify-center min-h-screen bg-gray-100"
+  id="landing"
+>
+  <h1 class="text-4xl font-bold mb-6">Disquiet Portfolio</h1>
+  <p class="mb-4">A unique, per-visit experience awaits.</p>
+  <button class="px-6 py-3 bg-indigo-600 text-white rounded" id="enterBtn">
+    Enter
+  </button>
+  <p class="mt-4 text-sm" id="landingError" role="alert" hidden></p>
+</div>
+
+<script>
+  import { seedStore } from '@/lib/experience/store';
+
+  const landingEl = document.getElementById('landing');
+  const btn = document.getElementById('enterBtn');
+  const errorEl = document.getElementById('landingError');
+
+  if (seedStore.get()) {
+    if (landingEl) landingEl.style.display = 'none';
+  }
+
+  function isLocalDevHost(): boolean {
+    return (
+      location.hostname === 'localhost' ||
+      location.hostname === '127.0.0.1' ||
+      location.hostname === '::1'
+    );
+  }
+
+  function hexFromBuffer(buffer: ArrayBuffer): string {
+    return Array.from(new Uint8Array(buffer))
+      .map((byte) => byte.toString(16).padStart(2, '0'))
+      .join('');
+  }
+
+  async function createLocalSeed(): Promise<string> {
+    const entropy = new Uint8Array(32);
+    crypto.getRandomValues(entropy);
+    const payload = `${location.origin}|${Date.now()}|${Array.from(entropy).join(',')}`;
+    const digest = await crypto.subtle.digest(
+      'SHA-256',
+      new TextEncoder().encode(payload),
+    );
+    return hexFromBuffer(digest);
+  }
+
+  async function getSeed(): Promise<string> {
+    const resp = await fetch(`/api/seed?ts=${Date.now()}`);
+    if (resp.ok) {
+      const body = (await resp.json()) as { seed?: unknown };
+      if (typeof body.seed === 'string' && body.seed.length > 0) {
+        return body.seed;
+      }
+    }
+
+    if (isLocalDevHost()) {
+      return createLocalSeed();
+    }
+
+    throw new Error('Seed endpoint failed.');
+  }
+
+  btn?.addEventListener('click', async () => {
+    if (!(btn instanceof HTMLButtonElement)) return;
+
+    btn.disabled = true;
+    if (errorEl) {
+      errorEl.hidden = true;
+      errorEl.textContent = '';
+    }
+
+    try {
+      const seed = await getSeed();
+      seedStore.set(seed);
+      location.reload();
+    } catch {
+      btn.disabled = false;
+      if (errorEl) {
+        errorEl.textContent = "I couldn't start the experience. Try again.";
+        errorEl.hidden = false;
+      }
+    }
+  });
+</script>

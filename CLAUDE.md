@@ -1,5 +1,17 @@
 # Disquiet portfolio — project rules
 
+## Required Context
+
+Before making any code changes, read these files in the project root:
+
+- ARCHITECTURE.md — system design and component relationships
+- STYLEGUIDE.md — coding conventions and patterns
+- CONTEXT.md — current progress and known issues
+- README.md — project overview and usage
+
+Follow all conventions established in these files. Do not deviate from the
+architecture or style guide without explicit user approval.
+
 Scope: applies inside this repo (`_portfolio`). This is a standalone project, not part of the
 `dev-projects` workspace it happens to live under.
 
@@ -7,13 +19,9 @@ Scope: applies inside this repo (`_portfolio`). This is a standalone project, no
 
 The workspace `CLAUDE.md` (`~/dev-projects/CLAUDE.md`) defaults every repo to read-only unless
 told otherwise. This repo is the exception: **hybrid**. Write and Edit are allowed here. Write
-code directly, run builds/tests, install packages. The user reviews every diff and may
-hand-apply anything themselves — the point is that they understand the code being shipped, not
-that they retype it. Favor explicit, conventional, well-commented code over clever
-abstraction; a non-obvious file gets a short header comment explaining why it exists.
+code directly, run builds/tests. The user reviews every diff and may hand-apply anything themselves — the point is that they understand the code being shipped, not that they retype it. Favor explicit, conventional, well-commented code over clever abstraction; a non-obvious file gets a short header comment explaining why it exists.
 
-Everything else in the workspace `CLAUDE.md` (code quality bar, planning discipline, avoid
-quick workarounds, no default parameter values, strict typing) still applies here.
+Everything else in the workspace `CLAUDE.md` (code quality bar, planning discipline, avoid quick workarounds, no default parameter values, strict typing) still applies here.
 
 ## Stack
 
@@ -32,30 +40,17 @@ plan).
 
 ## Conventions
 
-- Never read `.env` content — blocked by a hook in `.claude/settings.json`. The shape of
-  required vars lives in `.env.example`. If a task seems to need a secret's actual value, it
-  doesn't — pass it by reference (an env var name), never by value.
-- Module boundaries in `ARCHITECTURE.md` (content / UI / cross-cutting layers, plus the
-  contact function's isolation) are enforced by `dependency-cruiser` in CI. Don't propose an
-  import that crosses one without flagging it first.
-- The contact function (`api/contact.ts` + `handleContact`) is the entire attack surface of
-  this site. Never log a submitted name, email, or message. Never persist a submission.
-  Every non-2xx response is RFC 9457 `application/problem+json`.
-- No default parameter values in function signatures (workspace rule) — make every parameter
-  explicit at the call site, including in the contact function's `deps` object.
-- Before proposing a change that reverses a recorded architectural decision (an ADR, or
-  anything in ARCHITECTURE.md), restate the decision's reasoning and confirm the change is
-  intentional, not an oversight.
-- Before committing to a change with a real design tradeoff, call `advisor()` first — standing
-  rule, not optional.
-- Before writing a new file, cross-check `ARCHITECTURE.md` and the relevant ADR in full for
-  every requirement that file must meet. Do not rely on partial recall — re-read the source,
-  every time, not just on the first pass at a feature.
-- Code comments use the `plain-human-writing` skill's register: short, plain, active-voice
-  sentences, no AI-writing tells. Apply it to every comment, not just narrative prose.
+- Do not read or modify `.env` files.
+- Do not access files outside `/workspace`.
+- The shape of required vars lives in `.env.example`. If a task seems to need a secret's actual value, it doesn't — pass it by reference (an env var name), never by value.
+- Module boundaries in `ARCHITECTURE.md` (content / UI / cross-cutting layers, plus the contact function's isolation) are enforced by `dependency-cruiser` in CI. Don't propose an import that crosses one without flagging it first.
+- The contact function (`api/contact.ts` + `handleContact`) is the entire attack surface of this site. Never log a submitted name, email, or message. Never persist a submission. Every non-2xx response is RFC 9457 `application/problem+json`.
+- No default parameter values in function signatures (workspace rule) — make every parameter explicit at the call site, including in the contact function's `deps` object.
+- Before proposing a change that reverses a recorded architectural decision (an ADR, or anything in ARCHITECTURE.md), restate the decision's reasoning and confirm the change is intentional, not an oversight.
+- Before committing to a change with a real design tradeoff, call `advisor()` first — standing rule, not optional.
+- Before writing a new file, cross-check `ARCHITECTURE.md` and the relevant ADR in full for every requirement that file must meet. Do not rely on partial recall — re-read the source, every time, not just on the first pass at a feature.
+- Code comments use the `plain-human-writing` skill's register: short, plain, active-voice sentences, no AI-writing tells. Apply it to every comment, not just narrative prose.
 
 ## Communication style
 
-Default to terse, per the workspace rule: answer the question asked, no restating the
-request, no padding. Go longer only when explicitly asked to explain more, when a direct
-question's honest answer needs more, or when delivering/explaining code.
+Default to terse, per the workspace rule: answer the question asked, no restating the request, no padding. Go longer only when explicitly asked to explain more, when a direct question's honest answer needs more.

@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Landing from '../../components/experience/Landing.astro';
+import ExperienceRoot from '../../components/experience/ExperienceRoot.astro';
+import DetourSketch from '../../components/experience/DetourSketch.astro';
+import Exit from '../../components/experience/Exit.astro';
+---
+
+<BaseLayout title="Experience — Disquiet">
+  <ExperienceRoot>
+    <Landing slot="landing" />
+    <!-- Main experience content shows after seed is present -->
+    <section class="p-4">
+      <DetourSketch />
+      <Exit />
+    </section>
+  </ExperienceRoot>
+</BaseLayout>
