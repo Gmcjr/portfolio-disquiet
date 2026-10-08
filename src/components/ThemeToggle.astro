@@ -22,43 +22,7 @@
   </svg>
 </button>
 
-<script>
-  // @ts-nocheck
-
-  /** @type {HTMLButtonElement | null} */
-  const toggle = document.getElementById('theme-toggle');
-  /** @type {HTMLElement | null} */
-  const iconLight = document.getElementById('icon-light');
-  /** @type {HTMLElement | null} */
-  const iconDark = document.getElementById('icon-dark');
-
-  /** @param {string} theme */
-  function updateIcon(theme) {
-    if (!iconLight || !iconDark) return;
-    if (theme === 'dark') {
-      iconDark.classList.remove('hidden');
-      iconLight.classList.add('hidden');
-    } else {
-      iconLight.classList.remove('hidden');
-      iconDark.classList.add('hidden');
-    }
-  }
-
-  /** @param {string} theme */
-  function setTheme(theme) {
-    document.documentElement.dataset.theme = theme;
-    localStorage.setItem('theme', theme);
-    updateIcon(theme);
-  }
-
-  if (toggle) {
-    toggle.addEventListener('click', () => {
-      const newTheme =
-        document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-      setTheme(newTheme);
-    });
-  }
-
-  // init icon based on current theme
-  updateIcon(document.documentElement.dataset.theme || 'light');
+<script type="module">
+  import { initThemeToggle } from '../lib/themeToggle.js';
+  initThemeToggle();
 </script>
