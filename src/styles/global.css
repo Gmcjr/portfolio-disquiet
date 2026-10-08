@@ -11,21 +11,64 @@
 */
 
 @theme static {
-  --color-paper-0: #fbf9f5;
-  --color-ink-900: #1a1918;
-  --color-night-0: #131311;
-  --color-ink-50: #ece7dd;
+  /* Primitives – raw values */
+  --color-paper-0: #fafafa; /* light background */
+  --color-ink-900: #111111; /* dark text */
+  --color-night-0: #0a0a0a; /* dark mode background */
+  --color-ink-50: #777777; /* dark mode text */
+  --spacing-1: 0.25rem; /* 4px */
+  --spacing-2: 0.5rem; /* 8px */
+  --spacing-3: 1rem; /* 16px */
+  --radius-sm: 0.25rem; /* 4px */
+  --radius-md: 0.5rem; /* 8px */
+  --radius-lg: 1rem; /* 16px */
+  --duration-fast: 120ms;
+  --duration-base: 180ms;
+  --duration-slow: 260ms;
+  --easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @layer base {
   :root {
     --color-bg: var(--color-paper-0);
     --color-text: var(--color-ink-900);
+    --color-surface: var(--color-paper-0);
+    --color-border: var(--color-ink-50);
+    --color-accent: #c6d733; /* accent – placeholder */
+    --color-focus: var(--color-ink-900);
+    --color-danger: #dc2626;
+    --color-success: #16a34a;
+    --spacing-1: var(--spacing-1);
+    --spacing-2: var(--spacing-2);
+    --spacing-3: var(--spacing-3);
+    --radius-sm: var(--radius-sm);
+    --radius-md: var(--radius-md);
+    --radius-lg: var(--radius-lg);
+    --duration-fast: var(--duration-fast);
+    --duration-base: var(--duration-base);
+    --duration-slow: var(--duration-slow);
+    --easing-standard: var(--easing-standard);
   }
 
   [data-theme='dark'] {
     --color-bg: var(--color-night-0);
     --color-text: var(--color-ink-50);
+    --color-surface: var(--color-night-0);
+    --color-border: var(--color-ink-50);
+    --color-accent: #c6d733;
+    --color-focus: var(--color-ink-50);
+    --color-danger: #f87171;
+    --color-success: #4ade80;
+    --spacing-1: var(--spacing-1);
+    --spacing-2: var(--spacing-2);
+    --spacing-3: var(--spacing-3);
+    --radius-sm: var(--radius-sm);
+    --radius-md: var(--radius-md);
+    --radius-lg: var(--radius-lg);
+    --duration-fast: var(--duration-fast);
+    --duration-base: var(--duration-base);
+    --duration-slow: var(--duration-slow);
+    --easing-standard: var(--easing-standard);
   }
 
   body {
