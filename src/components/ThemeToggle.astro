@@ -1,0 +1,64 @@
+---
+---
+
+<button id="theme-toggle" aria-label="Toggle theme" class="p-2">
+  <svg
+    id="icon-light"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    class="w-6 h-6 hidden"
+    fill="currentColor"
+  >
+    <path d="M12 4.354a1 1 0 011 1v2a1 1 0 11-2 0v-2a1 1 0 011-1zm0 11a3 3 0 100-6 3 3 0 000 6zm5.657-9.657a1 1 0 010 1.414l-1.414 1.414a1 1 0 11-1.414-1.414l1.414-1.414a1 1 0 011.414 0zM6.757 17.657a1 1 0 010 1.414L5.343 20.485a1 1 0 11-1.414-1.414l1.414-1.414a1 1 0 011.414 0zM4 11a1 1 0 110 2H2a1 1 0 110-2h2zm18 0a1 1 0 110 2h-2a1 1 0 110-2h2zm-3.243-4.757a1 1 0 010 1.414L17.343 8.07a1 1 0 11-1.414-1.414l1.414-1.414a1 1 0 011.414 0zM6.757 6.757a1 1 0 010 1.414L5.343 9.585a1 1 0 11-1.414-1.414L5.343 6.757a1 1 0 011.414 0z" />
+  </svg>
+  <svg
+    id="icon-dark"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    class="w-6 h-6"
+    fill="currentColor"
+  >
+    <path d="M21.64 13.654a1 1 0 01-.223 1.119A9.75 9.75 0 0112.75 22a9.75 9.75 0 01-9.317-12.227 1 1 0 011.215-1.215 1 1 0 01.68.5 7.75 7.75 0 0015.603 5.967c.304-.162.68-.072.904.197a1 1 0 01-.196.952z" />
+  </svg>
+</button>
+
+<script>
+  // @ts-nocheck
+
+  /** @type {HTMLButtonElement | null} */
+  const toggle = document.getElementById('theme-toggle');
+  /** @type {HTMLElement | null} */
+  const iconLight = document.getElementById('icon-light');
+  /** @type {HTMLElement | null} */
+  const iconDark = document.getElementById('icon-dark');
+
+  /** @param {string} theme */
+  function updateIcon(theme) {
+    if (!iconLight || !iconDark) return;
+    if (theme === 'dark') {
+      iconDark.classList.remove('hidden');
+      iconLight.classList.add('hidden');
+    } else {
+      iconLight.classList.remove('hidden');
+      iconDark.classList.add('hidden');
+    }
+  }
+
+  /** @param {string} theme */
+  function setTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem('theme', theme);
+    updateIcon(theme);
+  }
+
+  if (toggle) {
+    toggle.addEventListener('click', () => {
+      const newTheme =
+        document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      setTheme(newTheme);
+    });
+  }
+
+  // init icon based on current theme
+  updateIcon(document.documentElement.dataset.theme || 'light');
+</script>
