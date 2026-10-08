@@ -1,31 +1,35 @@
 ---
 ---
 
-<div class="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
+<div class="flex flex-col items-center justify-center py-8 bg-gray-900 text-white">
   <h2 class="text-2xl mb-4">Time to Say Goodbye</h2>
   <button class="px-5 py-2 bg-red-600 rounded" id="goodbyeBtn">
     Goodbye
   </button>
 </div>
-
-<script>
-  import { seedStore } from '@/lib/experience/store';
-  import { summarise } from '@/lib/experience/metrics';
-  import { playRecap } from '@/lib/experience/audio';
+<script type="module">
+  import { seedStore } from '@/lib/experience/store.js';
+  import { summarise } from '@/lib/experience/metrics.js';
+  import { playRecap } from '@/lib/experience/audio.js';
 
   const btn = document.getElementById('goodbyeBtn');
-  btn?.addEventListener('click', async () => {
-    const seed = seedStore.get();
-    if (!seed) return;
-    const stats = summarise();
-    await playRecap(seed, stats);
-    // clear seed so landing shows next visit
-    seedStore.clear();
-    // simple fade-out
-    document.body.style.transition = 'opacity 1s';
-    document.body.style.opacity = '0';
-    setTimeout(() => {
-      location.href = '/';
-    }, 1200);
-  });
+  console.log('Exit script init – button', btn);
+  if (btn) {
+    btn.addEventListener('click', async () => {
+      console.log('Goodbye button clicked');
+      const seed = seedStore.get();
+      if (!seed) return;
+      const stats = summarise();
+      await playRecap(seed, stats);
+      btn.disabled = true;
+      btn.textContent = 'Loading…';
+      seedStore.clear();
+      // simple fade-out
+      document.body.style.transition = 'opacity 1s';
+      document.body.style.opacity = '0';
+      setTimeout(() => {
+        location.href = '/';
+      }, 1200);
+    });
+  }
 </script>

@@ -1,4 +1,3 @@
-import * as Tone from 'tone';
 import { deriveTokens } from './seed.js';
 
 /** Build and play a short recap using Tone.js. */
@@ -6,6 +5,9 @@ export async function playRecap(
   seed: string,
   metrics: ReturnType<typeof import('./metrics.js').summarise>,
 ) {
+  // Dynamically import Tone.js only after a user gesture.
+  const Tone = await import('tone');
+
   // Ensure Tone context is started (user interaction already happened).
   await Tone.start();
 

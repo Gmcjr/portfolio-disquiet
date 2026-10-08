@@ -1,11 +1,16 @@
 ---
 ---
 
-<div id="sketchContainer" class="w-full h-64 bg-gray-200"></div>
+<div
+  id="sketchContainer"
+  class="w-full h-64 bg-gray-900 flex items-center justify-center text-white"
+>
+  <span>Experience visual placeholder</span>
+</div>
 
 <script>
-  import { seedStore } from '@/lib/experience/store';
-  import { deriveTokens } from '@/lib/experience/seed';
+  import { seedStore } from '@/lib/experience/store.js';
+  import { deriveTokens } from '@/lib/experience/seed.js';
   // p5 is loaded dynamically because it is heavy and not needed on the server
   import('p5').then((p5Module) => {
     const p5 = p5Module.default;
@@ -20,7 +25,7 @@
           p.noLoop();
         };
         p.draw = () => {
-          p.background(`hsl(${sketch.bgHue},30%,90%)`);
+          p.background(`hsl(${sketch.bgHue},30%,30%)`);
           for (let i = 0; i < sketch.shapeCount; i++) {
             p.fill(`hsla(${(sketch.bgHue + i * 30) % 360},70%,50%,0.6)`);
             p.ellipse(

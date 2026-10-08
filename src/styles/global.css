@@ -71,9 +71,12 @@
     --easing-standard: var(--easing-standard);
   }
 
-  body {
+  body,
+  html {
     background-color: var(--color-bg);
     color: var(--color-text);
+    margin: 0; /* reset default margin to remove white space */
+    padding: 0;
   }
 
   :focus-visible {
