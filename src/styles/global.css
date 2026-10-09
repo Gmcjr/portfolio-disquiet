@@ -12,20 +12,39 @@
 
 @theme static {
   /* Primitives – raw values */
+  /* Colors */
   --color-paper-0: #fafafa; /* light background */
   --color-ink-900: #111111; /* dark text */
   --color-night-0: #0a0a0a; /* dark mode background */
   --color-ink-50: #777777; /* dark mode text */
+  --color-accent: #c6d733; /* acid chartreuse accent */
+  /* Spacing */
+  --spacing-0: 0rem;
   --spacing-1: 0.25rem; /* 4px */
   --spacing-2: 0.5rem; /* 8px */
   --spacing-3: 1rem; /* 16px */
+  --spacing-4: 2rem; /* 32px */
+  --spacing-5: 4rem; /* 64px */
+  /* Radii */
   --radius-sm: 0.25rem; /* 4px */
   --radius-md: 0.5rem; /* 8px */
   --radius-lg: 1rem; /* 16px */
+  --radius-full: 9999px;
+  /* Motion */
   --duration-fast: 120ms;
   --duration-base: 180ms;
   --duration-slow: 260ms;
+  --duration-slower: 400ms;
   --easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  /* Typography */
+  --font-sans:
+    'Inter var', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Fraunces', serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-size-base: 1rem; /* 16px */
+  --font-size-sm: 0.875rem; /* 14px */
+  --font-size-lg: 1.125rem; /* 18px */
+  --line-height-base: 1.65;
 }
 
 @layer base {
