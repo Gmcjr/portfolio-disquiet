@@ -1,0 +1,79 @@
+---
+export interface Props {
+  /** Base name of the audio file, e.g. "lovin" → looks for /audio/lovin.mp3 */
+  track: string;
+  /** Optional human‑readable title */
+  title?: string;
+}
+const { track, title = track } = Astro.props;
+const src = `/audio/${track}.mp3`;
+---
+
+<div class="flex items-center space-x-3 p-2 bg-gray-100/50 rounded-lg max-w-md shadow-sm">
+  <button
+    id="playBtn"
+    class="p-2 rounded-full bg-primary-600 text-white hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-400"
+  >
+    <svg
+      id="playIcon"
+      xmlns="http://www.w3.org/2000/svg"
+      class="w-5 h-5"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <polygon points="5 3 19 12 5 21 5 3" />
+    </svg>
+  </button>
+
+  <div class="flex-1">
+    <div class="text-sm font-medium">{title}</div>
+    <input
+      id="progress"
+      type="range"
+      min="0"
+      max="100"
+      value="0"
+      class="w-full h-1 bg-primary-200 rounded appearance-none cursor-pointer"
+    />
+  </div>
+
+  <audio id="audio" src={src} preload="metadata"></audio>
+
+  <script>
+    const audio = document.getElementById('audio') as HTMLAudioElement;
+    const playBtn = document.getElementById('playBtn') as HTMLButtonElement;
+    const playIcon = document.getElementById(
+      'playIcon',
+    ) as unknown as SVGSVGElement;
+    const progress = document.getElementById('progress') as HTMLInputElement;
+
+    // Auto‑play if URL contains a track param (optional)
+    if (new URLSearchParams(location.search).has('track')) {
+      audio.play().catch(() => {});
+    }
+
+    playBtn.addEventListener('click', () => {
+      audio.paused ? audio.play() : audio.pause();
+    });
+
+    audio.addEventListener('play', () => {
+      playIcon.innerHTML = '<polygon points="6 4 6 20 18 12 6 4" />';
+    });
+    audio.addEventListener('pause', () => {
+      playIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3" />';
+    });
+
+    audio.addEventListener('timeupdate', () => {
+      const percent = (audio.currentTime / audio.duration) * 100;
+      progress.value = percent.toString();
+    });
+
+    progress.addEventListener('input', () => {
+      audio.currentTime = (parseFloat(progress.value) / 100) * audio.duration;
+    });
+  </script>
+</div>

@@ -1,7 +1,7 @@
 ---
 import { ClientRouter } from 'astro:transitions';
 import '../styles/global.css';
-import ThemeToggle from '../components/ThemeToggle.astro';
+import Header from '../components/Header.astro';
 
 interface Props {
   title: string;
@@ -20,6 +20,43 @@ const { title } = Astro.props;
   initial-scale=1"
     />
     <title>{title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Arsenal:ital,wght@0,400;0,700;1,400;1,700&family=Cagliostro&family=Figtree:ital@0;1&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Geist+Pixel&family=Hedvig+Letters+Sans&family=Kumar+One+Outline&family=Lekton:ital,wght@0,400;0,700;1,400&family=Offside&family=Tenor+Sans&family=Young+Serif&family=Zen+Loop:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .kumar-one-outline-regular {
+        font-family: 'Kumar One Outline', system-ui;
+        font-weight: 400;
+        font-style: normal;
+      }
+      .lekton-regular {
+        font-family: 'Lekton', monospace;
+        font-weight: 400;
+        font-style: normal;
+      }
+      .lekton-bold {
+        font-family: 'Lekton', monospace;
+        font-weight: 700;
+        font-style: normal;
+      }
+      .lekton-regular-italic {
+        font-family: 'Lekton', monospace;
+        font-weight: 400;
+        font-style: italic;
+      }
+    </style>
+
+    <meta property="og:title" content="{title}" />
+    <meta
+      property="og:description"
+      content="Disquiet – A portfolio showcasing design and development work."
+    />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:url" content="https://example.com/" />
+    <link rel="icon" href="/favicon.ico" />
     <script>
       // Theme initialization – runs before first paint
       (function () {
@@ -43,9 +80,12 @@ const { title } = Astro.props;
       });
     </script>
   </head>
-  <body class="m-0">
-    <ThemeToggle />
+
+  <body class="m-0 lekton-regular">
+    <Header />
+    <main class="snap-y snap-mandatory min-h-screen">
+      <slot />
+    </main>
     <ClientRouter />
-    <slot />
   </body>
 </html>

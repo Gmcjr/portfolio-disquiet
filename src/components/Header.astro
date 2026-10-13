@@ -1,0 +1,26 @@
+---
+import ThemeToggle from '../components/ThemeToggle.astro';
+---
+
+<header class="bg-white shadow">
+  <nav class="max-w-4xl mx-auto flex items-center justify-between p-4">
+    <a href="/" class="text-xl font-bold text-current">
+      Disquiet
+    </a>
+    <div class="flex space-x-4">
+      <a href="/work" class="text-current">
+        Work
+      </a>
+      <a href="/about" class="text-current">
+        About
+      </a>
+      <a href="/writing" class="text-current">
+        Writing
+      </a>
+      <a href="/contact" class="text-current">
+        Contact
+      </a>
+      <ThemeToggle />
+    </div>
+  </nav>
+</header>

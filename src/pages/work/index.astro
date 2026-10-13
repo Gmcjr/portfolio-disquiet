@@ -6,13 +6,17 @@ const work = await getAllWork(import.meta.env.DEV);
 ---
 
 <BaseLayout title="Work - Disquiet">
-  <main>
-    <h1>Work</h1>
-    <ul>
+  <main class="max-w-3xl mx-auto py-12">
+    <!-- Removed redundant heading "Work" as the navigation already indicates the section. -->
+    <ul class="space-y-6">
       {work.map((entry) => (
-        <li>
-          <a href={`/work/${entry.id}`}>{entry.data.title}</a>
-          <p>{entry.data.summary}</p>
+        <li class="pb-4 px-4">
+          <a href={`/work/${entry.id}`} class="text-lg font-semibold underline">
+            {entry.data.title}
+          </a>
+          <div class="border p-2 rounded-sm text-sm text-gray-600 mt-1">
+            {entry.data.summary}
+          </div>
         </li>
       ))}
     </ul>
