@@ -1,0 +1,13 @@
+@theme static {
+  /* Primitive design tokens – placeholder values */
+  --color-paper-0: #fafafa;
+  --color-ink-900: #111111;
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --radius-sm: 0.125rem;
+  --radius-md: 0.25rem;
+  --radius-lg: 0.5rem;
+  --duration-fast: 120ms;
+  --duration-base: 180ms;
+  --duration-slow: 260ms;
+}

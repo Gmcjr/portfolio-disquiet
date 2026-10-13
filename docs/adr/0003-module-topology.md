@@ -1,3 +1,8 @@
+---
+status: accepted
+date: 2026-09-10
+---
+
 # ADR-0003: Layered module topology, lint-enforced
 
 **Status:** Accepted — 2026-09-10

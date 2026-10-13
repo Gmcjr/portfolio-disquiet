@@ -1,3 +1,8 @@
+---
+status: accepted
+date: 2026-09-10
+---
+
 # ADR-0008: Session‑specific audiovisual experience
 
 **Status:** Proposed — 2026-10-04

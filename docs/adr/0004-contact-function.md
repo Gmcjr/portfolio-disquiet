@@ -1,3 +1,8 @@
+---
+status: accepted
+date: 2026-09-10
+---
+
 # ADR-0004: Contact via one stateless serverless function
 
 **Status:** Accepted — 2026-09-10, timing-gate correction 2026-09-10

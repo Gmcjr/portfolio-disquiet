@@ -1,3 +1,8 @@
+---
+status: accepted
+date: 2026-09-10
+---
+
 # ADR-0006: GoatCounter for analytics
 
 **Status:** Accepted — 2026-09-10
