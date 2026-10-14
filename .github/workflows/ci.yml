@@ -20,3 +20,22 @@ jobs:
       - name: Validate documentation front‑matter
         run: |
           bun ts-node scripts/read-all-docs.ts | grep '^WARNING' && echo "❌ Missing front‑matter detected" && exit 1 || echo "✅ All docs have required front‑matter"
+
+  secret-guard:
+    runs-on: ubuntu-latest
+    needs: lint-docs
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan for hard‑coded secrets
+        run: |
+          echo "Scanning source files for secret strings..."
+          # Look for any occurrence of the actual env variable names (not the placeholders)
+          # Exclude .env.example and any generated files.
+          secrets_found=$(git grep -E "RESEND_API_KEY|CONTACT_TO|CONTACT_FROM|SITE_URL" -- "src" "public" || true)
+          if [ -n "$secrets_found" ]; then
+            echo "❌ Potential secret found in source files:"
+            echo "$secrets_found"
+            exit 1
+          else
+            echo "✅ No hard‑coded secrets detected."
+          fi

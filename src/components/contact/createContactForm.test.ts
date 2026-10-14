@@ -19,7 +19,7 @@ function mountForm(): HTMLElement {
       <div data-status role="status"></div>
       <div data-error-banner hidden>
         <p data-error-text></p>
-        <a data-mailto-link href="mailto:hello@disquiet.dev">Email me</a>
+        <a data-mailto-link href="mailto:gcjrdev001@gmail.com">Email me</a>
       </div>
       <div data-error-summary hidden tabindex="-1">
         <ul data-error-summary-list></ul>

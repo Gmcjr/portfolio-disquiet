@@ -5,7 +5,7 @@ project. Replace them with the real values when they become available.
 
 - **Site URL**: `https://disquiet.dev` (placeholder – see `src/config/site.ts`)
 - **Site name**: `Disquiet`
-- **Contact email**: `hello@disquiet.dev`
+- **Contact email**: `gcjrdev001@gmail.com`
 - **GoatCounter endpoint**: `https://disquiet.goatcounter.com/count`
 
 These values are referenced from `CONTEXT.md` (open items) and from the code base
