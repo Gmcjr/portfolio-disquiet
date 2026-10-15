@@ -101,3 +101,11 @@ frictionless (one file plus assets, no plumbing) — see ADR-0002.
 ## User instruction
 
 - **Do not commit any changes** unless the user explicitly says to do so. All modifications must remain uncommitted until explicit approval.
+
+## Recent work (this session)
+
+- Implemented a functional dark/light mode toggle:
+  - Added `public/themeToggle.js` and updated `ThemeToggle.astro`.
+  - Updated CSS globally in `src/styles/global.css`.
+  - Forced light mode on initial load via `BaseLayout.astro`.
+  - Updated documentation in `docs/CONTEXT.md` to record these changes.
