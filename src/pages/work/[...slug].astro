@@ -21,8 +21,8 @@ const { Content } = await render(entry);
 ---
 
 <BaseLayout title={`${entry.data.title} - Disquiet`}>
-  <main class="max-w-3xl mx-auto py-12 px-4">
-    <h2 class="text-2xl font-bold">{entry.data.title}</h2>
+  <main class="max-w-3xl mx-auto py-12 px-4 font-sans text-text">
+    <h2 class="text-2xl font-heading">{entry.data.title}</h2>
     <div class="border p-4 rounded-sm text-xs text-gray-500 mt-2 mb-4">
       {entry.data.role} • {entry.data.year}
     </div>
