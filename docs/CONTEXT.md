@@ -97,3 +97,7 @@ frictionless (one file plus assets, no plumbing) — see ADR-0002.
 - **A named human who reads the Resend quota-warning email.** The anti-spam posture (ADR-0004)
   is stateless by design; it only works if someone notices when the daily send quota is
   approached.
+
+## User instruction
+
+- **Do not commit any changes** unless the user explicitly says to do so. All modifications must remain uncommitted until explicit approval.

@@ -58,24 +58,16 @@ const { title } = Astro.props;
     <meta property="og:url" content="https://example.com/" />
     <link rel="icon" href="/favicon.ico" />
     <script>
-      // Theme initialization – runs before first paint
+      // Force light mode as default – runs before first paint
       (function () {
         if (typeof document === 'undefined') return;
-        const saved = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia(
-          '(prefers-color-scheme: dark)',
-        ).matches;
-        const theme = saved || (prefersDark ? 'dark' : 'light');
+        const theme = 'light';
         document.documentElement.dataset.theme = theme;
       })();
 
-      // Re-run on client-side navigation (Astro view transitions)
+      // Re-run on client-side navigation (Astro view transitions) – enforce light
       document.addEventListener('astro:after-swap', function () {
-        const saved = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia(
-          '(prefers-color-scheme: dark)',
-        ).matches;
-        const theme = saved || (prefersDark ? 'dark' : 'light');
+        const theme = 'light';
         document.documentElement.dataset.theme = theme;
       });
     </script>

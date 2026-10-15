@@ -1,3 +1,15 @@
 @import './tokens.css';
 @import './semantic.css';
 @import 'tailwindcss';
+
+/* Theme toggle icons */
+.icon-sun,
+.icon-moon {
+  display: none;
+}
+[data-theme='dark'] .icon-sun {
+  display: inline;
+}
+[data-theme='light'] .icon-moon {
+  display: inline;
+}
