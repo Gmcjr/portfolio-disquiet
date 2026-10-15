@@ -44,24 +44,4 @@
   /* Accent stays the same */
 }
 
-/* Expose the tokens as Tailwind‑compatible utilities via inline @theme block */
-@theme inline {
-  .bg-bg {
-    background-color: var(--bg);
-  }
-  .text-text {
-    color: var(--text);
-  }
-  .text-accent {
-    color: var(--accent);
-  }
-  .font-heading {
-    font-family: var(--font-heading);
-  }
-  .font-sans {
-    font-family: var(--font-sans);
-  }
-  .font-mono {
-    font-family: var(--font-mono);
-  }
-}
+/* Tailwind will generate utility classes (bg-bg, text-text, font-heading, etc.) based on the CSS custom properties defined above. */
