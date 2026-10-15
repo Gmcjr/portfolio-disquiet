@@ -7,14 +7,13 @@ const work = await getAllWork(import.meta.env.DEV);
 
 <BaseLayout title="Work - Disquiet">
   <main class="max-w-3xl mx-auto py-12 font-sans text-text">
-    <!-- Removed redundant heading "Work" as the navigation already indicates the section. -->
     <ul class="space-y-6">
       {work.map((entry) => (
         <li class="pb-4 px-4">
           <a href={`/work/${entry.id}`} class="text-lg font-semibold underline">
             {entry.data.title}
           </a>
-          <div class="border border-gray-300 bg-transparent p-2 rounded-sm shadow-sm text-sm text-gray-600 mt-1">
+          <div class="w-full rounded-sm border-gray-300 focus:border-gray-500 focus:ring-2 focus:ring-gray-500 bg-transparent shadow-sm px-3 py-2">
             {entry.data.summary}
           </div>
         </li>
