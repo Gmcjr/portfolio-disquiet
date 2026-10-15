@@ -14,7 +14,7 @@ const work = await getAllWork(import.meta.env.DEV);
           <a href={`/work/${entry.id}`} class="text-lg font-semibold underline">
             {entry.data.title}
           </a>
-          <div class="border p-2 rounded-sm text-sm text-gray-600 mt-1">
+          <div class="border border-gray-300 p-2 rounded-sm shadow-sm text-sm text-gray-600 mt-1">
             {entry.data.summary}
           </div>
         </li>
