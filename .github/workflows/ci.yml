@@ -32,6 +32,10 @@ jobs:
       - name: Install
         run: bun install --frozen-lockfile
 
+      - name: Generate Astro types
+        # Lint and typecheck need the astro:content types in .astro/.
+        run: bunx astro sync
+
       - name: Lint
         run: bun run lint
 
