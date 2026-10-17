@@ -22,12 +22,5 @@
         }
       ]
     }
-  ],
-  "routes": [
-    {
-      "src": "^/(writing|music|art)(/.*)?$",
-      "status": 404
-    },
-    { "handle": "filesystem" }
   ]
 }
