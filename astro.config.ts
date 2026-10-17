@@ -10,6 +10,11 @@ export default defineConfig({
   integrations: [mdx(), sitemap()],
   vite: {
     plugins: [tailwindcss()],
+    build: {
+      // Never inline small scripts into the HTML: the CSP (script-src 'self')
+      // blocks inline scripts. scripts/check-bundle-size.ts enforces this.
+      assetsInlineLimit: 0,
+    },
     resolve: {
       alias: {
         '@': resolve(import.meta.dirname, './src'),

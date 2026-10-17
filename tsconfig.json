@@ -8,6 +8,12 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": [".astro/types.d.ts", "src/**/*", "astro.config.ts", "api/**/*"],
+  "include": [
+    ".astro/types.d.ts",
+    "src/**/*",
+    "astro.config.ts",
+    "api/**/*",
+    "scripts/**/*"
+  ],
   "exclude": ["dist"]
 }

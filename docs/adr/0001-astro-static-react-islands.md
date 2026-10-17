@@ -1,3 +1,8 @@
+---
+status: accepted
+date: 2026-09-10
+---
+
 # ADR-0001: Astro 7 static output; React confined to (currently zero) islands
 
 **Status:** Accepted — 2026-09-10

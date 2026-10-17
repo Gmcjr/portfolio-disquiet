@@ -19,7 +19,7 @@ function mountForm(): HTMLElement {
       <div data-status role="status"></div>
       <div data-error-banner hidden>
         <p data-error-text></p>
-        <a data-mailto-link href="mailto:hello@disquiet.dev">Email me</a>
+        <a data-mailto-link href="mailto:gcjrdev001@gmail.com">Email me</a>
       </div>
       <div data-error-summary hidden tabindex="-1">
         <ul data-error-summary-list></ul>
@@ -75,6 +75,26 @@ describe('createContactForm', () => {
     const status = root.querySelector('[data-status]')!;
     expect(form.hidden).toBe(true);
     expect(status.textContent).toContain('Thanks');
+  });
+
+  it('sends an integer elapsedMs when the clock returns fractions', async () => {
+    const fakeFetch = vi
+      .fn()
+      .mockResolvedValue(
+        new Response(JSON.stringify({ ok: true }), { status: 200 }),
+      );
+    const times = [0.25, 2000.6];
+    createContactForm(root, {
+      now: () => times.shift() ?? 2000.6,
+      fetch: fakeFetch as typeof fetch,
+    });
+    fillValidForm(root);
+    await submit(root);
+
+    expect(fakeFetch).toHaveBeenCalledTimes(1);
+    const init = fakeFetch.mock.calls[0]?.[1] as RequestInit;
+    const body = JSON.parse(init.body as string) as { elapsedMs: number };
+    expect(Number.isInteger(body.elapsedMs)).toBe(true);
   });
 
   it('shows a fake success on honeypot fill, same as a real success', async () => {

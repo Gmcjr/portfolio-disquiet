@@ -1,28 +1,34 @@
 ---
 ---
 
+<!-- ThemeToggle component -->
+
+<!-- Button with icons; icons are swapped via CSS based on data-theme -->
 <button id="theme-toggle" aria-label="Toggle theme" class="p-2">
+  <!-- Sun (shown in dark mode) -->
   <svg
-    id="icon-light"
+    class="icon-sun w-6 h-6"
     xmlns="http://www.w3.org/2000/svg"
+    fill="none"
     viewBox="0 0 24 24"
-    class="w-6 h-6 hidden"
-    fill="currentColor"
+    stroke="currentColor"
+    stroke-width="2"
   >
-    <path d="M12 4.354a1 1 0 011 1v2a1 1 0 11-2 0v-2a1 1 0 011-1zm0 11a3 3 0 100-6 3 3 0 000 6zm5.657-9.657a1 1 0 010 1.414l-1.414 1.414a1 1 0 11-1.414-1.414l1.414-1.414a1 1 0 011.414 0zM6.757 17.657a1 1 0 010 1.414L5.343 20.485a1 1 0 11-1.414-1.414l1.414-1.414a1 1 0 011.414 0zM4 11a1 1 0 110 2H2a1 1 0 110-2h2zm18 0a1 1 0 110 2h-2a1 1 0 110-2h2zm-3.243-4.757a1 1 0 010 1.414L17.343 8.07a1 1 0 11-1.414-1.414l1.414-1.414a1 1 0 011.414 0zM6.757 6.757a1 1 0 010 1.414L5.343 9.585a1 1 0 11-1.414-1.414L5.343 6.757a1 1 0 011.414 0z" />
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      d="M12 3v2M12 19v2M5.636 5.636l1.414 1.414M16.95 16.95l1.414 1.414M3 12h2M19 12h2M5.636 18.364l1.414-1.414M16.95 7.05l1.414-1.414M12 8a4 4 0 100 8 4 4 0 000-8z"
+    />
   </svg>
+  <!-- Moon (shown in light mode) -->
   <svg
-    id="icon-dark"
+    class="icon-moon w-6 h-6"
     xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    class="w-6 h-6"
     fill="currentColor"
+    viewBox="0 0 24 24"
   >
-    <path d="M21.64 13.654a1 1 0 01-.223 1.119A9.75 9.75 0 0112.75 22a9.75 9.75 0 01-9.317-12.227 1 1 0 011.215-1.215 1 1 0 01.68.5 7.75 7.75 0 0015.603 5.967c.304-.162.68-.072.904.197a1 1 0 01-.196.952z" />
+    <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
   </svg>
 </button>
 
-<script type="module" is:inline>
-  import { initThemeToggle } from '../lib/themeToggle.js';
-  initThemeToggle();
-</script>
+<script src="/themeToggle.js" defer></script>

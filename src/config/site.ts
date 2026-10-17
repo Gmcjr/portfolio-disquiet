@@ -1,10 +1,13 @@
 export const SITE_URL = 'https://disquiet.dev'; // Placeholder unless it's available
 
-export const SITE_NAME = 'Disquiet';
+export const SITE_NAME = 'Garrin Costa, Jr.';
+export const PERSON_NAME = 'Garrin Costa, Jr.';
+export const PERSON_ROLE =
+  'Software Engineer, Audio Engineer, Music Producer/Sound Designer, Musician';
 export const SITE_DESCRIPTION =
   'Developer portfolio - case studies, and eventually music and visual art.';
 
-export const CONTACT_EMAIL = 'hello@disquiet.dev'; // Placeholder
+export const CONTACT_EMAIL = 'gmcostajr@gmail.com'; // Updated contact email
 
 export const GOATCOUNTER_ENDPOINT = 'https://disquiet.goatcounter.com/count'; // Placeholder
 
