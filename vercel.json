@@ -1,4 +1,9 @@
 {
+  "framework": "astro",
+  "installCommand": "bun install",
+  "buildCommand": "bun run build",
+  "outputDirectory": "dist",
+  "devCommand": "astro dev --port $PORT",
   "headers": [
     {
       "source": "/(.*)",

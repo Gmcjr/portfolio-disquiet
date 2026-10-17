@@ -1,61 +1,175 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Footer from '../../components/Footer.astro';
+import { CONTACT_EMAIL } from '../../config/site';
+
+const fieldClass =
+  'w-full rounded-sm border border-gray-300 focus:border-gray-500 focus:ring-2 focus:ring-gray-500 bg-transparent shadow-sm px-3 py-2';
 ---
 
 <BaseLayout title="Contact — Garrin Costa, Jr.">
-  <main class="max-w-xl mx-auto py-12 font-sans text-text">
+  <div class="max-w-xl mx-auto py-12 px-4 font-sans text-text">
     <h1 class="text-3xl font-heading mb-6 text-center">Get in Touch</h1>
+    <p class="mb-6">
+      Have a project, a question, or just want to say hello? Send a message
+      below.
+    </p>
 
-    <section class="bg-transparent dark:bg-transparent p-8 rounded-lg shadow-md">
-      <form method="POST" action="/api/contact" class="space-y-6">
+    <div id="contact-form">
+      <div data-error-summary hidden tabindex="-1" aria-live="polite">
+        <p>Please fix the following before sending:</p>
+        <ul data-error-summary-list></ul>
+      </div>
+
+      <!-- method="post" keeps field values out of the URL if the script never runs. -->
+      <form method="post" novalidate class="space-y-6">
         <div>
           <label for="name" class="block text-sm font-medium mb-1">
-            Name
+            Name <span aria-hidden="true">(required)</span>
           </label>
           <input
             id="name"
             name="name"
             type="text"
             required
-            class="w-full rounded-sm border-gray-300 focus:border-gray-500 focus:ring-2 focus:ring-gray-500 bg-transparent shadow-sm px-3 py-2"
+            maxlength="100"
+            aria-describedby="name-error"
+            class={fieldClass}
           />
+          <p id="name-error" data-error-for="name" role="alert"></p>
         </div>
 
         <div>
           <label for="email" class="block text-sm font-medium mb-1">
-            Email
+            Email <span aria-hidden="true">(required)</span>
           </label>
           <input
             id="email"
             name="email"
             type="email"
             required
-            class="w-full rounded-sm border-gray-300 focus:border-gray-500 focus:ring-2 focus:ring-gray-500 bg-transparent shadow-sm px-3 py-2"
+            maxlength="254"
+            aria-describedby="email-error"
+            class={fieldClass}
           />
+          <p id="email-error" data-error-for="email" role="alert"></p>
         </div>
 
         <div>
           <label for="message" class="block text-sm font-medium mb-1">
-            Message
+            Message <span aria-hidden="true">(required)</span>
           </label>
           <textarea
             id="message"
             name="message"
             rows="4"
             required
-            class="w-full rounded-sm border-gray-300 focus:border-gray-500 focus:ring-2 focus:ring-gray-500 bg-transparent shadow-sm px-3 py-2"
+            maxlength="2000"
+            aria-describedby="message-error"
+            class={fieldClass}
           ></textarea>
+          <p id="message-error" data-error-for="message" role="alert"></p>
         </div>
+
+        <!--
+          Honeypot field. A real visitor never sees or fills this in — it
+          sits off-screen, not display:none, because some bots skip fields
+          hidden that way but still fill in ones that are merely positioned
+          off-screen. aria-hidden and tabindex="-1" keep it out of the way
+          for screen readers and keyboard users too.
+        -->
+        <div class="honeypot-field">
+          <label for="_gotcha">Leave this field empty</label>
+          <input
+            id="_gotcha"
+            name="_gotcha"
+            type="text"
+            tabindex="-1"
+            autocomplete="off"
+            aria-hidden="true"
+          />
+        </div>
+
+        <p data-form-error role="alert"></p>
+
+        <p class="privacy-note text-sm">
+          When you submit this form, your name, email address, and message are
+          sent to me by email through Resend, a third-party email provider
+          (US-based). Resend processes and retains the message for up to 30 days
+          to deliver it. I don't store your message in any database or use it
+          for anything other than replying to you.
+        </p>
 
         <button
           type="submit"
           class="w-full bg-transparent border border-gray-300 rounded-sm py-2"
         >
-          Send Message
+          Send message
         </button>
       </form>
-    </section>
-  </main>
+
+      <div data-status role="status"></div>
+
+      <div data-error-banner hidden>
+        <p data-error-text></p>
+        <p>
+          Prefer email? Write to{' '}
+          <a data-mailto-link href={`mailto:${CONTACT_EMAIL}`}>
+            {CONTACT_EMAIL}
+          </a>
+          .
+        </p>
+      </div>
+    </div>
+
+    <p class="mt-6">
+      Prefer email? Write to{' '}
+      <a class="underline" href={`mailto:${CONTACT_EMAIL}`}>
+        {CONTACT_EMAIL}
+      </a>
+      .
+    </p>
+
+    <noscript>
+      <p>
+        This form needs JavaScript to send. Please email me directly at
+        <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+      </p>
+    </noscript>
+  </div>
   <Footer />
+
+  <script>
+    import { createContactForm } from '../../components/contact/createContactForm';
+
+    // ClientRouter runs this module once, sometimes after astro:page-load has
+    // already fired. A later return to /contact fires astro:page-load but does
+    // not run the module again. So: wire now, and on every page-load, with a
+    // flag on the root so the same form is never wired twice.
+    function wireContactForm(): void {
+      const root = document.getElementById('contact-form');
+      if (!root || root.dataset.wired === 'true') return;
+      root.dataset.wired = 'true';
+      createContactForm(root, {
+        now: () => performance.now(),
+        fetch: window.fetch.bind(window),
+      });
+    }
+
+    wireContactForm();
+    document.addEventListener('astro:page-load', wireContactForm);
+  </script>
+  <style>
+    /*
+      Puts the honeypot field where a sighted user never sees it, without
+      display:none. May move into a shared utility class in Recovery Step 4.
+    */
+    .honeypot-field {
+      position: absolute;
+      left: -9999px;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+    }
+  </style>
 </BaseLayout>

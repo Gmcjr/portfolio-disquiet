@@ -226,7 +226,9 @@ export function createContactForm(
       email: emailInput!.value,
       message: messageInput!.value,
       _gotcha: gotchaInput!.value,
-      elapsedMs: deps.now() - mountedAt,
+      // The schema wants an integer. performance.now() returns fractions in
+      // most browsers, so round here or the client check fails silently.
+      elapsedMs: Math.round(deps.now() - mountedAt),
     };
 
     // This check mirrors the server's schema for fast feedback only. The
