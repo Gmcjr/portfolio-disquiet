@@ -31,10 +31,10 @@
   /* Typography */
   /* Heading – Kumar One Outline (display font) */
   --font-heading: 'Kumar One Outline', system-ui, sans-serif;
-  /* Body/sans – Offside (clean display) – chosen as the better fit */
-  --font-sans: 'Offside', system-ui, sans-serif;
-  /* Monospace fallback – JetBrains Mono is already loaded via Google Fonts */
-  --font-mono: 'JetBrains Mono', monospace;
+  /* Body – Lekton (typewriter-style) */
+  --font-sans: 'Lekton', ui-monospace, monospace;
+  /* Code – JetBrains Mono (variable) */
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
 }
 
 /* Dark theme overrides – keep same accent, swap bg/text */

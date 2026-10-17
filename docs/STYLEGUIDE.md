@@ -35,7 +35,19 @@ framework‑free blocking script in `<head>` sets it before first paint from `lo
 
 ## Typography
 
-Self‑hosted variable fonts, all SIL OFL 1.1: **Fraunces** (headings), **Inter** (body/UI), **JetBrains Mono** (code). Subset to used axes; total weight ≤120 KB. Scale: 1.25 modular, 16 px base, fluid display sizes via `clamp()`. Body line‑height 1.65, measure ~66 ch.
+Self-hosted fonts through Fontsource packages, all SIL OFL 1.1 (user decision, 2026-10-17;
+replaces the earlier Fraunces / Inter plan):
+
+| Role     | Font                  | Weights              | Token            |
+| -------- | --------------------- | -------------------- | ---------------- |
+| Headings | **Kumar One Outline** | 400                  | `--font-heading` |
+| Body/UI  | **Lekton**            | 400, 400 italic, 700 | `--font-sans`    |
+| Code     | **JetBrains Mono**    | variable (`wght`)    | `--font-mono`    |
+
+Import only the weights in use (`src/styles/global.css`). The Latin files total about 75 KB,
+within the 120 KB budget. Google Fonts is not used, and the CSP (`font-src 'self'`) blocks it.
+
+Scale: 1.25 modular, 16 px base, fluid display sizes via `clamp()`. Body line‑height 1.65, measure ~66 ch.
 
 ## Layout
 

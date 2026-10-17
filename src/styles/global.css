@@ -1,3 +1,9 @@
+/* Self-hosted fonts (Fontsource). Only the weights in use; the CSP allows 'self' only. */
+@import '@fontsource/kumar-one-outline/400.css';
+@import '@fontsource/lekton/400.css';
+@import '@fontsource/lekton/400-italic.css';
+@import '@fontsource/lekton/700.css';
+@import '@fontsource-variable/jetbrains-mono/wght.css';
 @import './tokens.css';
 @import './semantic.css';
 @import 'tailwindcss';
