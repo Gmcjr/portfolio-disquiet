@@ -102,7 +102,14 @@ frictionless (one file plus assets, no plumbing) — see ADR-0002.
 
 - **Do not commit any changes** unless the user explicitly says to do so. All modifications must remain uncommitted until explicit approval.
 
-## Recent work (this session)
+## Roles (from 2026-10-16)
+
+- The user is the final authority on every decision, on the plan, and on the results.
+- Claude Code is the default agent for this repository. It builds the project with the user
+  and asks before any decision with a real tradeoff.
+- The active plan is `docs/plans/2026-10-16-recovery.md`.
+
+## Recent work (2026-10-14, before the audit)
 
 - Implemented a functional dark/light mode toggle:
   - Added `public/themeToggle.js` and updated `ThemeToggle.astro`.

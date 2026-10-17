@@ -1,11 +1,13 @@
 ---
-status: accepted
-date: 2026-09-10
+status: proposed
+date: 2026-10-04
 ---
 
 # ADR-0008: Session‑specific audiovisual experience
 
-**Status:** Proposed — 2026-10-04
+**Status:** Proposed — 2026-10-04. Under revision (2026-10-16): the audit found that this
+design conflicts with ADR-0007 and `CONTEXT.md` §5, and that its bundle-size figures are wrong.
+Rewrite this ADR before more code. See Step 6 of `docs/plans/2026-10-16-recovery.md`.
 **Reversibility:** Cheap — delete `api/seed.ts`, remove `src/lib/experience/*` and the `experience` UI components. The rest of the site (work pages, contact, etc.) remains unchanged.
 
 ## Context

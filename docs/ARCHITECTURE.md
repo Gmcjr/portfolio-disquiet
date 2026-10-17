@@ -1,7 +1,8 @@
 # Architecture — Disquiet portfolio
 
 Target architecture. If the code and this document disagree, that's drift — fix one of them,
-don't silently pick a side. See `CONTEXT.md` for why these decisions were made; see
+don't silently pick a side. **Known drift (2026-10-16):** see section 1 of
+`docs/plans/2026-10-16-recovery.md`. See `CONTEXT.md` for why these decisions were made; see
 `docs/adr/` for the individual decisions with alternatives considered.
 
 ## 1. Goals and constraints
