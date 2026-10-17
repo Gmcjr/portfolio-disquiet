@@ -22,7 +22,6 @@
 // The page must still work with no JavaScript at all. This script only
 // upgrades a form that already renders; it does not create the form.
 
-import { contactSchema } from '../../lib/contact-schema';
 import {
   contactFormReducer,
   initialState,
@@ -182,19 +181,6 @@ export function createContactForm(
     }
   }
 
-  function extractFieldErrors(
-    issues: { path: PropertyKey[]; message: string }[],
-  ): FieldErrors {
-    const fieldErrors: FieldErrors = {};
-    for (const issue of issues) {
-      const first = issue.path[0];
-      if (typeof first === 'string' && isFieldName(first)) {
-        fieldErrors[first] = issue.message;
-      }
-    }
-    return fieldErrors;
-  }
-
   function focusErrorSummary(): void {
     errorSummaryEl?.focus();
   }
@@ -226,23 +212,13 @@ export function createContactForm(
       email: emailInput!.value,
       message: messageInput!.value,
       _gotcha: gotchaInput!.value,
-      // The schema wants an integer. performance.now() returns fractions in
-      // most browsers, so round here or the client check fails silently.
+      // The server schema wants an integer. performance.now() returns
+      // fractions in most browsers, so round here.
       elapsedMs: Math.round(deps.now() - mountedAt),
     };
 
-    // This check mirrors the server's schema for fast feedback only. The
-    // server runs the same schema again and is the real authority.
-    const parsed = contactSchema.safeParse(payload);
-    if (!parsed.success) {
-      state = contactFormReducer(state, {
-        type: 'validationError',
-        fieldErrors: extractFieldErrors(parsed.error.issues),
-      });
-      render();
-      focusErrorSummary();
-      return;
-    }
+    // No validation here: the server runs the schema and returns field
+    // errors (422). Bundling Zod for the browser broke the JS budget.
 
     try {
       const response = await deps.fetch('/api/contact', {

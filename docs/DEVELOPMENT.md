@@ -23,6 +23,12 @@ bun run dev
 
 ## CI / CI‑related scripts
 
-- `npm run lint && npm run format:check && npm run typecheck && npm run depcruise && npm test && npm run build && npm run lint:ci && npm run audit:ci`
+| Command              | Does                                                       |
+| -------------------- | ---------------------------------------------------------- |
+| `bun run check:size` | JS and font budgets, no inline scripts (needs a build)     |
+| `bunx lhci autorun`  | Lighthouse CI on the built site (needs a build and Chrome) |
+
+CI runs, in order: install, lint, format check, typecheck, depcruise, test, build, secret
+scan, `check:size`, Lighthouse CI.
 
 For full details see the CI configuration in `.github/workflows/ci.yml`.

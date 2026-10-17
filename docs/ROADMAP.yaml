@@ -11,9 +11,9 @@ phases:
   - name: Recovery step 1 - Restore the contact form
     status: complete
   - name: Recovery step 2 - Platform settings
-    status: pending
+    status: complete
   - name: Recovery step 3 - CI as the only gate
-    status: pending
+    status: in-progress
   - name: Recovery step 4 - Tokens, theme, layout
     status: pending
   - name: Recovery step 5 - Real content

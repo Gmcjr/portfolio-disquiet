@@ -2,6 +2,8 @@
 import { ClientRouter } from 'astro:transitions';
 import '../styles/global.css';
 import Header from '../components/Header.astro';
+// Preload the body font so text does not reflow when it arrives (CLS).
+import lektonRegularUrl from '@fontsource/lekton/files/lekton-latin-400-normal.woff2?url';
 
 interface Props {
   title: string;
@@ -20,6 +22,13 @@ const { title } = Astro.props;
   initial-scale=1"
     />
     <title>{title}</title>
+    <link
+      rel="preload"
+      href={lektonRegularUrl}
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <style>
       .kumar-one-outline-regular {
         font-family: 'Kumar One Outline', system-ui;
