@@ -7,9 +7,20 @@ import { SITE_URL } from './src/config/site';
 
 export default defineConfig({
   site: SITE_URL,
-  integrations: [mdx(), sitemap()],
+  integrations: [
+    mdx(),
+    sitemap({
+      // /experience is unfinished until recovery plan Step 6.
+      filter: (page) => !page.includes('/experience'),
+    }),
+  ],
   vite: {
     plugins: [tailwindcss()],
+    build: {
+      // Never inline small scripts into the HTML: the CSP (script-src 'self')
+      // blocks inline scripts. scripts/check-bundle-size.ts enforces this.
+      assetsInlineLimit: 0,
+    },
     resolve: {
       alias: {
         '@': resolve(import.meta.dirname, './src'),

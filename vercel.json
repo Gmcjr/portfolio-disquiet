@@ -1,4 +1,9 @@
 {
+  "framework": "astro",
+  "installCommand": "bun install",
+  "buildCommand": "bun run build",
+  "outputDirectory": "dist",
+  "devCommand": "astro dev --port $PORT",
   "headers": [
     {
       "source": "/(.*)",
@@ -9,7 +14,10 @@
         },
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "Referrer-Policy", "value": "no-referrer-when-downgrade" },
-        { "key": "Permissions-Policy", "value": "" },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+        },
         { "key": "X-Frame-Options", "value": "DENY" },
         {
           "key": "Content-Security-Policy",
@@ -17,12 +25,5 @@
         }
       ]
     }
-  ],
-  "routes": [
-    {
-      "src": "^/(writing|music|art)(/.*)?$",
-      "status": 404
-    },
-    { "handle": "filesystem" }
   ]
 }

@@ -1,3 +1,8 @@
+---
+status: accepted
+date: 2026-09-10
+---
+
 # ADR-0004: Contact via one stateless serverless function
 
 **Status:** Accepted — 2026-09-10, timing-gate correction 2026-09-10
@@ -76,6 +81,11 @@ with a working `.headers.get()`. A named `export function POST(request: Request)
 work, but was rejected here: Vercel's own routing would then intercept every non-POST method
 before `handleContact` ever ran, making this ADR's own method-check (step 0, and its unit test)
 dead code.
+
+**Correction, 2026-10-17:** the browser no longer runs the shared Zod schema before it
+sends the form. Bundling Zod put 30.5 KB (gzip) of JS on `/contact`, against a 16 KB budget.
+The server still runs the schema (step 5) and returns field-level errors, which the form
+shows. `src/lib/contact-schema.ts` is now server-only in practice. User decision.
 
 ## Consequences
 

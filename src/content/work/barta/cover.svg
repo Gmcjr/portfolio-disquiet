@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="t">
+  <title id="t">Barta moderation pipeline</title>
+  <rect width="1200" height="630" fill="#faf9f6"/>
+  <g font-family="ui-monospace, Menlo, Consolas, monospace" fill="#1a1a1a" font-size="26">
+    <text x="60" y="80" font-size="34" font-weight="700">barta / moderation pipeline</text>
+
+    <g stroke="#1a1a1a" stroke-width="3" fill="none">
+      <rect x="60" y="250" width="230" height="110" rx="6"/>
+      <rect x="350" y="235" width="270" height="140" rx="6"/>
+      <rect x="680" y="250" width="190" height="110" rx="6"/>
+      <rect x="910" y="120" width="260" height="90" rx="6"/>
+      <rect x="910" y="270" width="260" height="90" rx="6" stroke="#c6d733" stroke-width="5"/>
+      <rect x="910" y="420" width="260" height="90" rx="6"/>
+      <path d="M290 305 H344 M620 305 H674 M870 305 L904 165 M870 305 H904 M870 305 L904 465"/>
+    </g>
+
+    <text x="80" y="298">new post</text>
+    <text x="80" y="334" font-size="20" fill="#595959">goes live</text>
+    <text x="370" y="283">post + job</text>
+    <text x="370" y="319" font-size="20" fill="#595959">one transaction</text>
+    <text x="370" y="349" font-size="20" fill="#595959">(outbox)</text>
+    <text x="700" y="298">Gemini</text>
+    <text x="700" y="334" font-size="20" fill="#595959">score 0–1</text>
+    <text x="932" y="160">remove</text>
+    <text x="932" y="192" font-size="20" fill="#595959">≥ 0.85 or illegal</text>
+    <text x="932" y="310">moderator</text>
+    <text x="932" y="342" font-size="20" fill="#595959">unsure or failed</text>
+    <text x="932" y="460">approve</text>
+    <text x="932" y="492" font-size="20" fill="#595959">≤ 0.15</text>
+
+    <text x="60" y="580" font-size="20" fill="#595959">version check: a late AI verdict never overwrites a moderator's decision</text>
+  </g>
+</svg>

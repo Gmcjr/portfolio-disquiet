@@ -22,7 +22,6 @@
 // The page must still work with no JavaScript at all. This script only
 // upgrades a form that already renders; it does not create the form.
 
-import { contactSchema } from '../../lib/contact-schema';
 import {
   contactFormReducer,
   initialState,
@@ -54,6 +53,27 @@ const FIELD_LABELS: Record<FieldName, string> = {
 
 function isFieldName(value: string): value is FieldName {
   return (FIELD_NAMES as readonly string[]).includes(value);
+}
+
+// Returns the RFC 9457 body from api/contact.ts, or null when the response is
+// something else (HTML error page, empty body, unrelated JSON).
+async function readProblem(response: Response): Promise<ProblemDetails | null> {
+  try {
+    const body: unknown = await response.json();
+    if (
+      typeof body === 'object' &&
+      body !== null &&
+      'type' in body &&
+      typeof body.type === 'string' &&
+      'detail' in body &&
+      typeof body.detail === 'string'
+    ) {
+      return body as ProblemDetails;
+    }
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 export function createContactForm(
@@ -182,19 +202,6 @@ export function createContactForm(
     }
   }
 
-  function extractFieldErrors(
-    issues: { path: PropertyKey[]; message: string }[],
-  ): FieldErrors {
-    const fieldErrors: FieldErrors = {};
-    for (const issue of issues) {
-      const first = issue.path[0];
-      if (typeof first === 'string' && isFieldName(first)) {
-        fieldErrors[first] = issue.message;
-      }
-    }
-    return fieldErrors;
-  }
-
   function focusErrorSummary(): void {
     errorSummaryEl?.focus();
   }
@@ -226,21 +233,13 @@ export function createContactForm(
       email: emailInput!.value,
       message: messageInput!.value,
       _gotcha: gotchaInput!.value,
-      elapsedMs: deps.now() - mountedAt,
+      // The server schema wants an integer. performance.now() returns
+      // fractions in most browsers, so round here.
+      elapsedMs: Math.round(deps.now() - mountedAt),
     };
 
-    // This check mirrors the server's schema for fast feedback only. The
-    // server runs the same schema again and is the real authority.
-    const parsed = contactSchema.safeParse(payload);
-    if (!parsed.success) {
-      state = contactFormReducer(state, {
-        type: 'validationError',
-        fieldErrors: extractFieldErrors(parsed.error.issues),
-      });
-      render();
-      focusErrorSummary();
-      return;
-    }
+    // No validation here: the server runs the schema and returns field
+    // errors (422). Bundling Zod for the browser broke the JS budget.
 
     try {
       const response = await deps.fetch('/api/contact', {
@@ -255,9 +254,16 @@ export function createContactForm(
         return;
       }
 
-      const problem = (await response.json()) as ProblemDetails;
+      const problem = await readProblem(response);
 
-      if (problem.type.includes('submitted-too-fast')) {
+      if (!problem) {
+        // Not our function's problem+json (for example a platform 404 or
+        // 500 page). The server answered, so do not blame the connection.
+        state = contactFormReducer(state, {
+          type: 'vendorError',
+          message: `Something went wrong on the server (HTTP ${response.status}). Please email me directly.`,
+        });
+      } else if (problem.type.includes('submitted-too-fast')) {
         state = contactFormReducer(state, { type: 'tooFast' });
       } else if (problem.type.includes('validation-failed') && problem.errors) {
         const fieldErrors: FieldErrors = {};

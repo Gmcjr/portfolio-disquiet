@@ -5,16 +5,22 @@ import { getAllWork } from '../../lib/content';
 const work = await getAllWork(import.meta.env.DEV);
 ---
 
-<BaseLayout title="Work - Disquiet">
-  <main>
-    <h1>Work</h1>
-    <ul>
+<BaseLayout
+  title="Work"
+  description="Case studies of software projects, and the part I built in each one."
+>
+  <div class="max-w-3xl mx-auto py-12 font-sans text-text">
+    <ul class="space-y-6">
       {work.map((entry) => (
-        <li>
-          <a href={`/work/${entry.id}`}>{entry.data.title}</a>
-          <p>{entry.data.summary}</p>
+        <li class="pb-4 px-4">
+          <a href={`/work/${entry.id}`} class="text-lg font-semibold underline">
+            {entry.data.title}
+          </a>
+          <div class="w-full rounded-sm border-gray-300 focus:border-gray-500 focus:ring-2 focus:ring-gray-500 bg-transparent shadow-sm px-3 py-2">
+            {entry.data.summary}
+          </div>
         </li>
       ))}
     </ul>
-  </main>
+  </div>
 </BaseLayout>

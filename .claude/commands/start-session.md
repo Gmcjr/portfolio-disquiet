@@ -13,10 +13,10 @@ instead of treating it as an error.
 
 1. `CLAUDE.md` — build posture (hybrid: you write directly, the user reviews every diff),
    stack, conventions, the workspace-level read-only override for this project.
-2. `CONTEXT.md` — the twelve framework fields (problem, users, scale, constraints, MVP
+2. `docs/CONTEXT.md` — the twelve framework fields (problem, users, scale, constraints, MVP
    boundary, success metric) as durable background. Read this before treating any requirement
-   as settled or re-litigating a decision already made.
-3. `ARCHITECTURE.md` — the target architecture: rendering strategy, content model, module
+   as settled or re‑litigating a decision already made.
+3. `docs/ARCHITECTURE.md` — the target architecture: rendering strategy, content model, module
    topology, the contact function, deploy shape. Check any planned change against this before
    proposing it — it is not a suggestion, it is what got decided and reviewed.
 4. `docs/adr/*.md` — skim titles only, don't read in full yet. These are the individual
@@ -27,6 +27,19 @@ instead of treating it as an error.
 progress` (active) vs `Complete` (historical).
 6. `docs/RUNBOOK.md` — if present, the smoke-test and rollback steps. Relevant once anything
    is deployed.
+
+**Argument handling:**
+
+## Automatic full‑doc load (new)
+
+Before any of the above steps run, the session will execute the helper script that reads **all** markdown/YAML files under the `docs/` folder, validates required front‑matter and prints a concise summary (or the full file when metadata is missing). This guarantees the assistant always has the latest planning context.
+
+```bash
+# Auto‑load everything under docs/
+bun ts-node scripts/read-all-docs.ts
+```
+
+---
 
 **Argument handling:**
 

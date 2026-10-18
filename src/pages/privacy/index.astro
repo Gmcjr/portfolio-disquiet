@@ -2,13 +2,16 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="Privacy — Disquiet">
-  <main>
+<BaseLayout
+  title="Privacy"
+  description="How this site handles analytics and contact form data."
+>
+  <div class="font-sans text-text">
     <h1>Privacy</h1>
     <section>
       <h2>Analytics</h2>
       <p>
-        This site uses{' '}
+        This site does not use analytics yet. When it does, it will use{' '}
         <a
           href="https://www.goatcounter.com/"
           target="_blank"
@@ -16,23 +19,26 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         >
           GoatCounter
         </a>
-        for anonymous, cookieless traffic statistics. No personal data is
-        collected.
+        , which counts visits without cookies and without personal data. This
+        page will say so before that starts.
+      </p>
+      <p>
+        Your choice of light or dark theme is saved in your own browser. It
+        never leaves your device.
       </p>
     </section>
     <section>
       <h2>Contact form</h2>
       <p>
         When you submit the contact form, your name, email address, and message
-        are sent to me via
+        are sent to me via{' '}
         <a href="https://resend.com/" target="_blank" rel="noopener noreferrer">
           Resend
         </a>
-        , a third‑party email service (US‑based). Resend processes and retains
-        the message for up to 30 days to deliver it. The site does not store
-        your message, and it is never used for anything other than replying to
-        you.
+        , a third-party email service based in the US. Resend keeps the message
+        for up to 30 days to deliver it. The site does not store your message,
+        and I use it only to reply to you.
       </p>
     </section>
-  </main>
+  </div>
 </BaseLayout>

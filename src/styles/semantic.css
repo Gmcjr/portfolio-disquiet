@@ -1,0 +1,26 @@
+/* Tier 2 — semantic tokens: names by meaning, switched by the theme.
+   Components use these (bg-bg, text-text), never a primitive color. */
+
+/* dark: utilities follow the site theme (data-theme), not the OS setting. */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+@layer base {
+  :root {
+    --bg: var(--color-paper-0);
+    --text: var(--color-ink-900);
+    --muted: var(--color-ink-600);
+  }
+
+  [data-theme='dark'] {
+    --bg: var(--color-ink-950);
+    --text: var(--color-paper-0);
+    --muted: var(--color-ink-300);
+  }
+}
+
+/* Tier 3 — expose the semantic names as Tailwind utilities (bg-bg, text-text). */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+}

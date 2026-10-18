@@ -1,3 +1,8 @@
+---
+status: accepted
+date: 2026-09-10
+---
+
 # ADR-0002: File-based content model, frozen URL namespace
 
 **Status:** Accepted — 2026-09-10

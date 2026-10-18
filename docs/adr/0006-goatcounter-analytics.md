@@ -1,6 +1,13 @@
+---
+status: accepted
+date: 2026-09-10
+---
+
 # ADR-0006: GoatCounter for analytics
 
-**Status:** Accepted — 2026-09-10
+**Status:** Accepted — 2026-09-10. Implementation deferred to launch (user decision,
+2026-10-17): previews have no real visitors. See Step 7 of
+`docs/plans/2026-10-16-recovery.md`.
 **Reversibility:** Cheap — swapping the script tag for a different provider is a one-file change.
 
 ## Context

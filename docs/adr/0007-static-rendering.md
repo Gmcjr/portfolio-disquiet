@@ -1,3 +1,8 @@
+---
+status: accepted
+date: 2026-09-10
+---
+
 # ADR-0007: Static rendering as the invariant, one documented exception
 
 **Status:** Accepted — 2026-09-10

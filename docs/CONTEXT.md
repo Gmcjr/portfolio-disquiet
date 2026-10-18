@@ -97,3 +97,22 @@ frictionless (one file plus assets, no plumbing) — see ADR-0002.
 - **A named human who reads the Resend quota-warning email.** The anti-spam posture (ADR-0004)
   is stateless by design; it only works if someone notices when the daily send quota is
   approached.
+
+## User instruction
+
+- **Do not commit any changes** unless the user explicitly says to do so. All modifications must remain uncommitted until explicit approval.
+
+## Roles (from 2026-10-16)
+
+- The user is the final authority on every decision, on the plan, and on the results.
+- Claude Code is the default agent for this repository. It builds the project with the user
+  and asks before any decision with a real tradeoff.
+- The active plan is `docs/plans/2026-10-16-recovery.md`.
+
+## Recent work (2026-10-14, before the audit)
+
+- Implemented a functional dark/light mode toggle:
+  - Added `public/themeToggle.js` and updated `ThemeToggle.astro`.
+  - Updated CSS globally in `src/styles/global.css`.
+  - Forced light mode on initial load via `BaseLayout.astro`.
+  - Updated documentation in `docs/CONTEXT.md` to record these changes.

@@ -1,14 +1,20 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Footer from '../../components/Footer.astro';
 import { CONTACT_EMAIL } from '../../config/site';
+
+const fieldClass =
+  'w-full rounded-sm border border-gray-300 focus:border-gray-500 focus:ring-2 focus:ring-gray-500 bg-transparent shadow-sm px-3 py-2';
 ---
 
-<BaseLayout title="Contact — Disquiet">
-  <main>
-    <h1>Contact</h1>
-    <p>
-      Have a project, a question, or just want to say hello? Send a message
-      below.
+<BaseLayout
+  title="Contact"
+  description="Send a message about a role, a project, or a question."
+>
+  <div class="max-w-xl mx-auto py-12 px-4 font-sans text-text">
+    <h1 class="text-3xl font-heading mb-6 text-center">Get in touch</h1>
+    <p class="mb-6">
+      Send me a message about a role, a project, or a question.
     </p>
 
     <div id="contact-form">
@@ -17,9 +23,10 @@ import { CONTACT_EMAIL } from '../../config/site';
         <ul data-error-summary-list></ul>
       </div>
 
-      <form novalidate>
+      <!-- method="post" keeps field values out of the URL if the script never runs. -->
+      <form method="post" novalidate class="space-y-6">
         <div>
-          <label for="name">
+          <label for="name" class="block text-sm font-medium mb-1">
             Name <span aria-hidden="true">(required)</span>
           </label>
           <input
@@ -29,12 +36,13 @@ import { CONTACT_EMAIL } from '../../config/site';
             required
             maxlength="100"
             aria-describedby="name-error"
+            class={fieldClass}
           />
           <p id="name-error" data-error-for="name" role="alert"></p>
         </div>
 
         <div>
-          <label for="email">
+          <label for="email" class="block text-sm font-medium mb-1">
             Email <span aria-hidden="true">(required)</span>
           </label>
           <input
@@ -44,20 +52,23 @@ import { CONTACT_EMAIL } from '../../config/site';
             required
             maxlength="254"
             aria-describedby="email-error"
+            class={fieldClass}
           />
           <p id="email-error" data-error-for="email" role="alert"></p>
         </div>
 
         <div>
-          <label for="message">
+          <label for="message" class="block text-sm font-medium mb-1">
             Message <span aria-hidden="true">(required)</span>
           </label>
           <textarea
             id="message"
             name="message"
+            rows="4"
             required
             maxlength="2000"
             aria-describedby="message-error"
+            class={fieldClass}
           ></textarea>
           <p id="message-error" data-error-for="message" role="alert"></p>
         </div>
@@ -83,7 +94,7 @@ import { CONTACT_EMAIL } from '../../config/site';
 
         <p data-form-error role="alert"></p>
 
-        <p class="privacy-note">
+        <p class="privacy-note text-sm">
           When you submit this form, your name, email address, and message are
           sent to me by email through Resend, a third-party email provider
           (US-based). Resend processes and retains the message for up to 30 days
@@ -91,7 +102,12 @@ import { CONTACT_EMAIL } from '../../config/site';
           for anything other than replying to you.
         </p>
 
-        <button type="submit">Send message</button>
+        <button
+          type="submit"
+          class="w-full bg-transparent border border-gray-300 rounded-sm py-2"
+        >
+          Send message
+        </button>
       </form>
 
       <div data-status role="status"></div>
@@ -99,7 +115,7 @@ import { CONTACT_EMAIL } from '../../config/site';
       <div data-error-banner hidden>
         <p data-error-text></p>
         <p>
-          Prefer email? Write to
+          Prefer email? Write to{' '}
           <a data-mailto-link href={`mailto:${CONTACT_EMAIL}`}>
             {CONTACT_EMAIL}
           </a>
@@ -108,9 +124,12 @@ import { CONTACT_EMAIL } from '../../config/site';
       </div>
     </div>
 
-    <p>
+    <p class="mt-6">
       Prefer email? Write to{' '}
-      <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+      <a class="underline" href={`mailto:${CONTACT_EMAIL}`}>
+        {CONTACT_EMAIL}
+      </a>
+      .
     </p>
 
     <noscript>
@@ -119,24 +138,33 @@ import { CONTACT_EMAIL } from '../../config/site';
         <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
       </p>
     </noscript>
-  </main>
+  </div>
+  <Footer />
 
   <script>
     import { createContactForm } from '../../components/contact/createContactForm';
 
-    const root = document.getElementById('contact-form');
-    if (root) {
+    // ClientRouter runs this module once, sometimes after astro:page-load has
+    // already fired. A later return to /contact fires astro:page-load but does
+    // not run the module again. So: wire now, and on every page-load, with a
+    // flag on the root so the same form is never wired twice.
+    function wireContactForm(): void {
+      const root = document.getElementById('contact-form');
+      if (!root || root.dataset.wired === 'true') return;
+      root.dataset.wired = 'true';
       createContactForm(root, {
         now: () => performance.now(),
         fetch: window.fetch.bind(window),
       });
     }
+
+    wireContactForm();
+    document.addEventListener('astro:page-load', wireContactForm);
   </script>
   <style>
     /*
-      This is a functional/security utility. Its one job is to put the honeypot field where a sighted user will never see
-      it, without using display:none. Once design tokens exist
-      (Phase 6), this may move into a shared utility class.
+      Puts the honeypot field where a sighted user never sees it, without
+      display:none. May move into a shared utility class in Recovery Step 4.
     */
     .honeypot-field {
       position: absolute;

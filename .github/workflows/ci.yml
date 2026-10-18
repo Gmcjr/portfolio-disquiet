@@ -1,0 +1,71 @@
+name: CI
+
+# The only merge gate (recovery plan Step 3). Every step blocks.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Generate Astro types
+        # Lint and typecheck need the astro:content types in .astro/.
+        run: bunx astro sync
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Format
+        run: bun run format:check
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Module boundaries
+        run: bun run depcruise
+
+      - name: Unit tests
+        run: bun run test
+
+      - name: Build
+        run: bun run build
+
+      - name: Secret scan
+        # Resend API keys start with re_. Fails on any key-like string in
+        # tracked files or in the built site.
+        run: |
+          pattern='\bre_[A-Za-z0-9_]{24,}'
+          if git grep -nE "$pattern" -- . ':!bun.lock' || grep -rnE "$pattern" dist; then
+            echo "Possible Resend API key found."
+            exit 1
+          fi
+
+      - name: Size budgets and inline scripts
+        run: bun run check:size
+
+      - name: Lighthouse (performance and accessibility)
+        run: bunx lhci autorun

@@ -1,0 +1,24 @@
+# Active plan: docs/plans/2026-10-16-recovery.md (replaces MVP Phases 5 and 6)
+phases:
+  - name: Repo and config
+    status: complete
+  - name: Quality rails
+    status: complete
+  - name: Content pipeline seam
+    status: complete
+  - name: Form seam
+    status: complete
+  - name: Recovery step 1 - Restore the contact form
+    status: complete
+  - name: Recovery step 2 - Platform settings
+    status: complete
+  - name: Recovery step 3 - CI as the only gate
+    status: complete
+  - name: Recovery step 4 - Tokens, theme, layout
+    status: complete
+  - name: Recovery step 5 - Real content
+    status: complete
+  - name: Recovery step 6 - Experience milestone
+    status: pending
+  - name: Recovery step 7 - Clean up
+    status: pending

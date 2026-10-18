@@ -20,14 +20,14 @@ const { entry } = Astro.props;
 const { Content } = await render(entry);
 ---
 
-<BaseLayout title={`${entry.data.title} - Disquiet`}>
-  <main>
-    <h1>{entry.data.title}</h1>
-    <p>
+<BaseLayout title={entry.data.title} description={entry.data.summary}>
+  <div class="max-w-3xl mx-auto py-12 px-4 font-sans text-text">
+    <h2 class="text-2xl font-heading">{entry.data.title}</h2>
+    <div class="border p-4 rounded-sm text-xs text-muted mt-2 mb-4">
       {entry.data.role} • {entry.data.year}
-    </p>
-    <article>
+    </div>
+    <article class="prose dark:prose-invert p-4">
       <Content />
     </article>
-  </main>
+  </div>
 </BaseLayout>
