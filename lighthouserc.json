@@ -5,11 +5,14 @@
       "url": [
         "http://localhost/",
         "http://localhost/work/",
+        "http://localhost/work/barta/",
+        "http://localhost/work/network-monitor/",
+        "http://localhost/work/gallerist/",
         "http://localhost/about/",
         "http://localhost/contact/",
         "http://localhost/privacy/"
       ],
-      "numberOfRuns": 1,
+      "numberOfRuns": 3,
       "settings": {
         "onlyCategories": ["performance", "accessibility", "seo"]
       }
