@@ -12,9 +12,11 @@ interface Props {
   title?: string;
   /** Meta description for search results and social cards. */
   description?: string;
+  /** Ask search engines not to index this page. */
+  noindex?: boolean;
 }
 
-const { title } = Astro.props;
+const { title, noindex } = Astro.props;
 const description = Astro.props.description ?? SITE_DESCRIPTION;
 const fullTitle = title ? `${title} — ${SITE_NAME}` : SITE_NAME;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
@@ -32,6 +34,7 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
+    {noindex && <meta name="robots" content="noindex" />}
     <link
       rel="preload"
       href={lektonRegularUrl}

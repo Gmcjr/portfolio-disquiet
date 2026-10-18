@@ -7,7 +7,13 @@ import { SITE_URL } from './src/config/site';
 
 export default defineConfig({
   site: SITE_URL,
-  integrations: [mdx(), sitemap()],
+  integrations: [
+    mdx(),
+    sitemap({
+      // /experience is unfinished until recovery plan Step 6.
+      filter: (page) => !page.includes('/experience'),
+    }),
+  ],
   vite: {
     plugins: [tailwindcss()],
     build: {
