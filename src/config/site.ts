@@ -23,4 +23,5 @@ export const NAV: NavItem[] = [
   { label: 'Music', href: '/music', enabled: false },
   { label: 'Art', href: '/art', enabled: false },
   { label: 'About', href: '/about', enabled: true },
+  { label: 'Contact', href: '/contact', enabled: true },
 ];

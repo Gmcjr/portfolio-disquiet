@@ -55,6 +55,27 @@ function isFieldName(value: string): value is FieldName {
   return (FIELD_NAMES as readonly string[]).includes(value);
 }
 
+// Returns the RFC 9457 body from api/contact.ts, or null when the response is
+// something else (HTML error page, empty body, unrelated JSON).
+async function readProblem(response: Response): Promise<ProblemDetails | null> {
+  try {
+    const body: unknown = await response.json();
+    if (
+      typeof body === 'object' &&
+      body !== null &&
+      'type' in body &&
+      typeof body.type === 'string' &&
+      'detail' in body &&
+      typeof body.detail === 'string'
+    ) {
+      return body as ProblemDetails;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export function createContactForm(
   root: HTMLElement,
   deps: ContactFormDeps,
@@ -233,9 +254,16 @@ export function createContactForm(
         return;
       }
 
-      const problem = (await response.json()) as ProblemDetails;
+      const problem = await readProblem(response);
 
-      if (problem.type.includes('submitted-too-fast')) {
+      if (!problem) {
+        // Not our function's problem+json (for example a platform 404 or
+        // 500 page). The server answered, so do not blame the connection.
+        state = contactFormReducer(state, {
+          type: 'vendorError',
+          message: `Something went wrong on the server (HTTP ${response.status}). Please email me directly.`,
+        });
+      } else if (problem.type.includes('submitted-too-fast')) {
         state = contactFormReducer(state, { type: 'tooFast' });
       } else if (problem.type.includes('validation-failed') && problem.errors) {
         const fieldErrors: FieldErrors = {};

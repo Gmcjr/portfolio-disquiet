@@ -5,8 +5,11 @@ import { getAllWork } from '../../lib/content';
 const work = await getAllWork(import.meta.env.DEV);
 ---
 
-<BaseLayout title="Work - Garrin Costa, Jr.">
-  <main class="max-w-3xl mx-auto py-12 font-sans text-text">
+<BaseLayout
+  title="Work"
+  description="Case studies of software projects: the problem, the approach, and the result."
+>
+  <div class="max-w-3xl mx-auto py-12 font-sans text-text">
     <ul class="space-y-6">
       {work.map((entry) => (
         <li class="pb-4 px-4">
@@ -19,5 +22,5 @@ const work = await getAllWork(import.meta.env.DEV);
         </li>
       ))}
     </ul>
-  </main>
+  </div>
 </BaseLayout>

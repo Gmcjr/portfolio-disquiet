@@ -103,9 +103,8 @@ typecheck, depcruise, unit tests, build, secret scan, `check:size`, and Lighthou
 - **`check:size`** (`scripts/check-bundle-size.ts`) on the built output: JS per page (gzip)
   ≤12 KB on content routes and ≤16 KB on `/contact`; Latin font files ≤120 KB; no inline
   scripts (the CSP blocks them). `/experience` is exempt until recovery plan Step 6.
-- **Lighthouse CI** (`lighthouserc.json`) on 6 routes. Thresholds now: performance ≥0.9,
-  accessibility ≥0.95, LCP ≤2000 ms, CLS ≤0.1. Step 4 of the recovery plan raises them to the
-  targets: accessibility 1.0, CLS ≤0.05, and SEO checked.
+- **Lighthouse CI** (`lighthouserc.json`) on 6 routes, at the full targets since
+  2026-10-17: performance ≥0.9, accessibility 1.0, SEO 1.0, LCP ≤2000 ms, CLS ≤0.05.
 - **Accessibility:** WCAG 2.2 AA. Lighthouse runs axe-core for the automated part (user
   decision, 2026-10-17: no separate axe CLI). Manual review covers the rest.
 
