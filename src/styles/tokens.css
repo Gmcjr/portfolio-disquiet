@@ -1,9 +1,13 @@
+/* Tier 1 — primitive tokens: raw values with no assigned meaning.
+   Components never use these colors directly; see semantic.css. */
 @theme static {
-  /* Primitive design tokens */
   /* Colors */
-  --color-paper-0: #faf9f6; /* warm off‑white background */
-  --color-ink-900: #1a1a1a; /* warm near‑black text */
-  --color-accent: #c6d733; /* acid chartreuse – final accent */
+  --color-paper-0: #faf9f6; /* warm off‑white */
+  --color-ink-900: #1a1a1a; /* warm near‑black */
+  --color-ink-950: #111111; /* dark-mode background */
+  --color-ink-600: #595959; /* muted text on paper (6.7:1) */
+  --color-ink-300: #a6a6a6; /* muted text on ink-950 (7.8:1) */
+  --color-accent: #c6d733; /* acid chartreuse — decoration only, never text */
 
   /* Spacing (based on 0.25rem = 4px grid) */
   --spacing-1: 0.25rem; /* 4px */
@@ -24,4 +28,9 @@
   --duration-base: 180ms;
   --duration-slow: 260ms;
   --duration-slower: 400ms;
+
+  /* Fonts (see docs/STYLEGUIDE.md, Typography) */
+  --font-heading: 'Kumar One Outline', system-ui, sans-serif;
+  --font-sans: 'Lekton', ui-monospace, monospace;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
 }

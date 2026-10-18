@@ -19,19 +19,29 @@ on hover/focus.
 
 ## Token architecture (Tailwind v4)
 
-Three tiers in `src/styles/global.css`:
+Three tiers, imported by `src/styles/global.css` after `@import 'tailwindcss'`:
 
-1. **Primitives**, in `@theme static { }` — raw values, no assigned meaning (`--color-paper-0`,
-   `--color-ink-900`, the type scale, spacing keys, radii, shadows, easings, durations).
-2. **Semantic tokens**, in `@layer base` on `:root { }` and `[data-theme="dark"] { }` — each `= var(<primitive>)`.
-   Components reference these, never a primitive directly.
-3. **`@theme inline { }`** re‑exposes the semantic names as Tailwind utilities (`bg-bg`, `text-text`, …).
+1. **Primitives** — `src/styles/tokens.css`, in `@theme static { }`. Raw values with no
+   assigned meaning: colors (`--color-paper-0`, `--color-ink-*`, `--color-accent`), spacing,
+   radii, durations, and the 3 font stacks.
+2. **Semantic tokens** — `src/styles/semantic.css`, in `@layer base` on `:root { }` and
+   `[data-theme='dark'] { }`. Each is `var(<primitive>)`: `--bg`, `--text`, `--muted`.
+   Components use these, never a primitive color.
+3. **`@theme inline { }`** — also in `semantic.css`. Exposes the semantic names as utilities:
+   `bg-bg`, `text-text`, `text-muted`.
+
+`tailwind.config.js` is not used; Tailwind v4 ignores it. Contrast (WCAG AA): `--text` is
+16.5:1 (light) and 17.9:1 (dark); `--muted` is 6.7:1 (light) and 7.8:1 (dark).
 
 ## Dark mode
 
-Three states: light / dark / follow‑system, via a `data-theme` attribute on `<html>`. A short,
-framework‑free blocking script in `<head>` sets it before first paint from `localStorage.theme`
-(absent = `prefers-color-scheme`). The toggle is a plain `<button>` plus inline script.
+Two states, light and dark, via a `data-theme` attribute on `<html>`. **Dark is the default**
+(user decision, 2026-10-17; replaces the earlier follow-system plan). `public/theme.js` is a
+blocking classic script in `<head>`: it sets the theme from `localStorage.theme` before first
+paint and handles the toggle through listeners on `document`, so it survives `ClientRouter`
+swaps. It is a file, not inline, because the CSP blocks inline scripts. The `dark:` variant
+follows `data-theme`, not the OS setting. The toggle is a plain `<button>` with
+`aria-pressed` (true = dark).
 
 ## Typography
 

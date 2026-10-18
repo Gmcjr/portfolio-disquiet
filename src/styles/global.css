@@ -4,9 +4,9 @@
 @import '@fontsource/lekton/400-italic.css';
 @import '@fontsource/lekton/700.css';
 @import '@fontsource-variable/jetbrains-mono/wght.css';
+@import 'tailwindcss';
 @import './tokens.css';
 @import './semantic.css';
-@import 'tailwindcss';
 
 /* Theme toggle icons */
 .icon-sun,

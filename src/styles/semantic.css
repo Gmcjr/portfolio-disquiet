@@ -1,47 +1,26 @@
-/* Semantic design tokens – map primitives to meaningful names */
+/* Tier 2 — semantic tokens: names by meaning, switched by the theme.
+   Components use these (bg-bg, text-text), never a primitive color. */
 
-@import './tokens.css';
+/* dark: utilities follow the site theme (data-theme), not the OS setting. */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
-:root {
-  /* Colors */
-  --bg: var(--color-paper-0);
-  --text: var(--color-ink-900);
-  --accent: var(--color-accent);
+@layer base {
+  :root {
+    --bg: var(--color-paper-0);
+    --text: var(--color-ink-900);
+    --muted: var(--color-ink-600);
+  }
 
-  /* Spacing */
-  --space-1: var(--spacing-1);
-  --space-2: var(--spacing-2);
-  --space-3: var(--spacing-3);
-  --space-4: var(--spacing-4);
-  --space-5: var(--spacing-5);
-  --space-6: var(--spacing-6);
-
-  /* Radii */
-  --radius-sm: var(--radius-sm);
-  --radius-md: var(--radius-md);
-  --radius-lg: var(--radius-lg);
-  --radius-xl: var(--radius-xl);
-
-  /* Durations */
-  --duration-fast: var(--duration-fast);
-  --duration-base: var(--duration-base);
-  --duration-slow: var(--duration-slow);
-  --duration-slower: var(--duration-slower);
-
-  /* Typography */
-  /* Heading – Kumar One Outline (display font) */
-  --font-heading: 'Kumar One Outline', system-ui, sans-serif;
-  /* Body – Lekton (typewriter-style) */
-  --font-sans: 'Lekton', ui-monospace, monospace;
-  /* Code – JetBrains Mono (variable) */
-  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+  [data-theme='dark'] {
+    --bg: var(--color-ink-950);
+    --text: var(--color-paper-0);
+    --muted: var(--color-ink-300);
+  }
 }
 
-/* Dark theme overrides – keep same accent, swap bg/text */
-[data-theme='dark'] {
-  --bg: #111111;
-  --text: #faf9f6;
-  /* Accent stays the same */
+/* Tier 3 — expose the semantic names as Tailwind utilities (bg-bg, text-text). */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
 }
-
-/* Tailwind will generate utility classes (bg-bg, text-text, font-heading, etc.) based on the CSS custom properties defined above. */

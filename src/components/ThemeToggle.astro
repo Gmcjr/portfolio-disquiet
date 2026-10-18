@@ -4,7 +4,14 @@
 <!-- ThemeToggle component -->
 
 <!-- Button with icons; icons are swapped via CSS based on data-theme -->
-<button id="theme-toggle" aria-label="Toggle theme" class="p-2">
+<!-- public/theme.js handles clicks and sets aria-pressed (true = dark). -->
+<button
+  id="theme-toggle"
+  type="button"
+  aria-label="Dark mode"
+  aria-pressed="true"
+  class="p-2"
+>
   <!-- Sun (shown in dark mode) -->
   <svg
     class="icon-sun w-6 h-6"
@@ -30,5 +37,3 @@
     <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
   </svg>
 </button>
-
-<script src="/themeToggle.js" defer></script>

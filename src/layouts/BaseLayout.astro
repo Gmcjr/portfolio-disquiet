@@ -13,7 +13,7 @@ const { title } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="utf-8" />
     <meta
@@ -29,28 +29,6 @@ const { title } = Astro.props;
       type="font/woff2"
       crossorigin
     />
-    <style>
-      .kumar-one-outline-regular {
-        font-family: 'Kumar One Outline', system-ui;
-        font-weight: 400;
-        font-style: normal;
-      }
-      .lekton-regular {
-        font-family: 'Lekton', monospace;
-        font-weight: 400;
-        font-style: normal;
-      }
-      .lekton-bold {
-        font-family: 'Lekton', monospace;
-        font-weight: 700;
-        font-style: normal;
-      }
-      .lekton-regular-italic {
-        font-family: 'Lekton', monospace;
-        font-weight: 400;
-        font-style: italic;
-      }
-    </style>
 
     <meta property="og:title" content="{title}" />
     <meta
@@ -60,23 +38,11 @@ const { title } = Astro.props;
     <meta property="og:image" content="/og-image.png" />
     <meta property="og:url" content="https://example.com/" />
     <link rel="icon" href="/favicon.ico" />
-    <script>
-      // Force light mode as default – runs before first paint
-      (function () {
-        if (typeof document === 'undefined') return;
-        const theme = 'light';
-        document.documentElement.dataset.theme = theme;
-      })();
-
-      // Re-run on client-side navigation (Astro view transitions) – enforce light
-      document.addEventListener('astro:after-swap', function () {
-        const theme = 'light';
-        document.documentElement.dataset.theme = theme;
-      });
-    </script>
+    <!-- Blocking on purpose: sets the theme before first paint. See public/theme.js. -->
+    <script is:inline src="/theme.js"></script>
   </head>
 
-  <body class="m-0 lekton-regular">
+  <body class="m-0 bg-bg text-text font-sans">
     <Header />
     <main class="snap-y snap-mandatory min-h-screen">
       <slot />
