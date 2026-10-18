@@ -1,6 +1,6 @@
 ---
 import ThemeToggle from '../components/ThemeToggle.astro';
-import { NAV } from '../config/site';
+import { NAV, SITE_NAME } from '../config/site';
 
 // Only enabled sections render, so a reserved section never gets a dead link.
 const links = NAV.filter((item) => item.enabled);
@@ -15,7 +15,7 @@ const isCurrent = (href: string): boolean =>
     class="max-w-4xl mx-auto flex items-center justify-between p-4"
   >
     <a href="/" class="text-xl font-heading text-text">
-      Disquiet
+      {SITE_NAME}
     </a>
     <div class="flex items-center space-x-4">
       {links.map((item) => (

@@ -1,8 +1,11 @@
 ---
+import { SITE_NAME } from '../config/site';
 ---
 
 <footer class="py-4 text-center text-sm text-muted">
-  <p>© {new Date().getFullYear()} Disquiet. All rights reserved.</p>
+  <p>
+    © {new Date().getFullYear()} {SITE_NAME} All rights reserved.
+  </p>
   <p class="mt-1">
     This site stores no personal data. The{' '}
     <a class="underline" href="/privacy">
