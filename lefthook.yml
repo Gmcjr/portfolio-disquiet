@@ -11,6 +11,8 @@ pre-commit:
       glob: '*.{astro,ts,tsx,js,mjs,cjs}'
       run: bunx eslint --fix --max-warnings=0 {staged_files}
       stage_fixed: true
+    secrets:
+      run: bun scripts/scan-secrets.ts {staged_files}
 
 pre-push:
   parallel: true
@@ -19,3 +21,5 @@ pre-push:
       run: bun run typecheck
     depcruise:
       run: bun run depcruise
+    test:
+      run: bun run test

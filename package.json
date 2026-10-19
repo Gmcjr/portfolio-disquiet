@@ -10,14 +10,14 @@
     "build": "astro build",
     "preview": "astro preview",
     "typecheck": "astro check && tsc --noEmit",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "depcruise": "depcruise src api --config",
     "test": "vitest run",
     "prepare": "lefthook install",
-    "guard:secrets": "grep -R \"RESEND_API_KEY\" -n src public && echo \"Secret found\" && exit 1 || exit 0",
+    "scan:secrets": "bun scripts/scan-secrets.ts",
     "check:size": "bun scripts/check-bundle-size.ts"
   },
   "dependencies": {
@@ -28,10 +28,8 @@
     "@fontsource/lekton": "5.3.0",
     "@tailwindcss/vite": "4.3.3",
     "astro": "7.3.2",
-    "p5": "1.10.0",
     "resend": "6.28.0",
     "tailwindcss": "4.3.3",
-    "tone": "14.9.0",
     "zod": "4.6.4"
   },
   "devDependencies": {
@@ -46,7 +44,6 @@
     "lefthook": "2.1.12",
     "prettier": "3.9.6",
     "prettier-plugin-astro": "1.0.0",
-    "sonda": "^0.14.0",
     "typescript": "6.0.3",
     "typescript-eslint": "8.70.0",
     "vitest": "5.0.0"

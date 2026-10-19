@@ -10,7 +10,8 @@ export default defineConfig({
   integrations: [
     mdx(),
     sitemap({
-      // /experience is unfinished until recovery plan Step 6.
+      // /experience stays out of the sitemap until PR-C adds the link
+      // (docs/plans/2026-10-18-experience-phase-a.md, decision 15).
       filter: (page) => !page.includes('/experience'),
     }),
   ],

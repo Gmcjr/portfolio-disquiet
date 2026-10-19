@@ -30,19 +30,6 @@ progress` (active) vs `Complete` (historical).
 
 **Argument handling:**
 
-## Automatic full‑doc load (new)
-
-Before any of the above steps run, the session will execute the helper script that reads **all** markdown/YAML files under the `docs/` folder, validates required front‑matter and prints a concise summary (or the full file when metadata is missing). This guarantees the assistant always has the latest planning context.
-
-```bash
-# Auto‑load everything under docs/
-bun ts-node scripts/read-all-docs.ts
-```
-
----
-
-**Argument handling:**
-
 - If `$ARGUMENTS` matches a file in `docs/plans/` (by filename, with or without `.md`, fuzzy
   match on a close partial name), that plan is what this session resumes. Read it in full,
   verify where implementation actually left off against the real code (not just the plan's own
