@@ -9,7 +9,9 @@
 //
 // Flash safety (WCAG 2.3.1): every scene moves with u_time, which advances at most
 // about 2.3 units a second, so no pixel's brightness cycles near 3 times a second.
-// The fields keep low spatial frequencies and a light range of 0.18–0.85.
+// The fields keep low spatial frequencies and a light range of 0.18–0.85. The
+// atmosphere (haze, dust, grain) runs on the same clock; the dust fades over
+// seconds, and the vignette never moves.
 
 import {
   BRIGHTNESS_RAMP_MIN_MS,
@@ -40,7 +42,7 @@ const FRAGMENT = `
 precision mediump float;
 uniform vec2 u_res;
 uniform float u_time, u_hue, u_sat, u_dim, u_flow, u_turb, u_grain, u_ghost, u_absence;
-uniform float u_layers, u_offset, u_mode, u_scene;
+uniform float u_layers, u_offset, u_mode, u_scene, u_trail;
 uniform vec2 u_light;
 uniform vec3 u_ripples[${MAX_RIPPLES}];
 
@@ -158,7 +160,8 @@ void main() {
   light += u_ghost * 0.08 * smoothstep(0.01, 0.0, abs(fract(length(uv - 0.5) * 6.0) - 0.5) - 0.48);
   vec2 ap = uv - vec2(0.78, 0.78); ap.x *= aspect;
   light -= u_absence * 0.2 * smoothstep(0.3, 0.0, length(ap));
-  light += (hash(uv * u_res + u_time) - 0.5) * 0.08 * (u_grain + (u_mode > 0.5 && u_mode < 1.5 ? 0.5 : 0.0));
+  // Film grain: always a little, more with typing.
+  light += (hash(uv * u_res + u_time) - 0.5) * 0.08 * (0.35 + u_grain + (u_mode > 0.5 && u_mode < 1.5 ? 0.5 : 0.0));
   light *= (1.0 - u_dim);
   vec3 color = hsl(hue, sat, clamp(light, 0.0, 0.85));
   if (u_mode > 0.5 && u_mode < 1.5) {
@@ -170,6 +173,32 @@ void main() {
     color.b = hsl(hue, sat, clamp(light + (fb - f) * 0.3, 0.0, 0.85)).b;
     color *= 0.88 + 0.12 * sin(gl_FragCoord.y * 3.1416);
   }
+  // Atmosphere (ADR-0008 Amendment 4). Haze: two slow fog layers at different
+  // depths; stillness (trail) thickens it, and scroll shifts the near layer.
+  vec2 hp = uv * vec2(aspect, 1.0);
+  float fogFar = noise(hp * 1.5 + vec2(u_time * 0.02, 0.0));
+  float fogNear = noise(hp * 3.0 - vec2(u_time * 0.035, u_offset * 0.004) + 4.0);
+  float fog = smoothstep(0.3, 0.9, fogFar * 0.65 + fogNear * 0.35) * (0.12 + u_trail * 0.35);
+  color = mix(color, hsl(u_hue + 30.0, 0.25, 0.55), fog * (1.0 - u_dim));
+  // Dust: at most one soft mote per cell, drifting up, fading in and out slowly.
+  vec2 dg = hp * 18.0 + vec2(0.0, -u_time * 0.15);
+  vec2 di = floor(dg);
+  float dh = hash(di);
+  vec2 dpos = 0.2 + 0.6 * vec2(hash(di + 1.7), hash(di + 4.1));
+  float mote = smoothstep(0.08, 0.0, length(fract(dg) - dpos)) * step(0.6, dh);
+  float twinkle = 0.5 + 0.5 * sin(u_time * 0.4 + dh * 6.2831);
+  color += mote * twinkle * 0.25 * (0.4 + u_trail) * (1.0 - u_dim);
+  // Vignette: fixed, never pulsing.
+  vec2 vc = uv - 0.5;
+  color *= 1.0 - dot(vc, vc) * 0.9;
+  // No saturated red (WCAG 2.3.1), by the same test as color.ts isSaturatedRed:
+  // red's share of the sum, in gamma and in linear light, stays below 0.8.
+  color = min(color, vec3(0.9));
+  vec3 lin = pow(color, vec3(2.2));
+  float redShare = max(color.r / max(color.r + color.g + color.b, 0.0001),
+                       lin.r / max(lin.r + lin.g + lin.b, 0.0001));
+  float grey = dot(color, vec3(0.299, 0.587, 0.114));
+  color = mix(color, vec3(grey), smoothstep(0.6, 0.75, redShare) * 0.85);
   gl_FragColor = vec4(color, 1.0);
 }
 `;
@@ -238,6 +267,7 @@ export function createShaderVisualEngine(
       gl.uniform1f(u('u_flow'), v.flow);
       gl.uniform1f(u('u_turb'), v.turbulence);
       gl.uniform1f(u('u_grain'), v.grain);
+      gl.uniform1f(u('u_trail'), v.trailLength);
       gl.uniform1f(u('u_ghost'), v.ghost);
       gl.uniform1f(u('u_absence'), v.absenceMark);
       gl.uniform1f(u('u_layers'), v.layerCount);

@@ -47,6 +47,134 @@ export function createP5VisualEngine(deps: P5EngineDeps): VisualEngine {
   const ripples: { x: number; y: number; age: number; inverse: boolean }[] = [];
   const seed = Math.floor(rand() * 1_000_000);
 
+  // Atmosphere (ADR-0008 Amendment 4): haze, dust, grain, and a fixed vignette, on
+  // an overlay canvas that is cleared every frame, so the layers never build up
+  // on the trails below. They move only with `time`, so they stop when the image
+  // stops.
+  const overlay = document.createElement('canvas');
+  overlay.style.cssText = 'position:absolute;inset:0;pointer-events:none';
+  overlay.width = host.clientWidth || window.innerWidth;
+  overlay.height = host.clientHeight || window.innerHeight;
+  host.append(overlay);
+  const octx = overlay.getContext('2d');
+  const tile = (
+    size: number,
+    fill: (i: number) => number,
+  ): HTMLCanvasElement => {
+    const c = document.createElement('canvas');
+    c.width = size;
+    c.height = size;
+    const ctx = c.getContext('2d');
+    if (ctx !== null) {
+      const data = ctx.createImageData(size, size);
+      for (let i = 0; i < size * size; i += 1) {
+        const value = fill(i);
+        data.data.set([value, value, value, 255], i * 4);
+      }
+      ctx.putImageData(data, 0, 0);
+    }
+    return c;
+  };
+  const grainTile = tile(128, () => Math.floor(rand() * 256));
+  // Soft fog: a few large blurred blobs, drawn once at a low resolution.
+  const fogTile = document.createElement('canvas');
+  fogTile.width = 64;
+  fogTile.height = 64;
+  const fctx = fogTile.getContext('2d');
+  if (fctx !== null) {
+    for (let i = 0; i < 14; i += 1) {
+      const x = rand() * 64;
+      const y = rand() * 64;
+      const r = 8 + rand() * 18;
+      const g = fctx.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, 'rgba(255,255,255,0.5)');
+      g.addColorStop(1, 'rgba(255,255,255,0)');
+      fctx.fillStyle = g;
+      for (const dx of [-64, 0, 64]) {
+        for (const dy of [-64, 0, 64]) {
+          fctx.setTransform(1, 0, 0, 1, dx, dy);
+          fctx.fillRect(0, 0, 64, 64);
+        }
+      }
+    }
+    fctx.setTransform(1, 0, 0, 1, 0, 0);
+  }
+  const motes = Array.from({ length: 60 }, () => ({
+    x: rand(),
+    y: rand(),
+    phase: rand() * Math.PI * 2,
+    speed: 0.004 + rand() * 0.01,
+  }));
+
+  function drawAtmosphere(v: VisualParams, hue: number): void {
+    if (octx === null) return;
+    const w = overlay.width;
+    const h = overlay.height;
+    octx.clearRect(0, 0, w, h);
+    const fade = 1 - v.dim;
+    // Haze: the fog tile, tinted and stretched, in two drifting layers.
+    const fog = safeColor(hue + 30, 0.25, 0.7);
+    octx.globalCompositeOperation = 'source-over';
+    for (const [scale, drift, alpha] of [
+      [1.2, 0.02, 0.55],
+      [0.7, 0.035, 0.45],
+    ] as const) {
+      const size = Math.max(w, h) * scale;
+      const ox = -((time * drift * size) % size);
+      octx.globalAlpha = alpha * (0.15 + v.trailLength * 0.35) * fade;
+      for (const x of [ox, ox + size]) {
+        for (let y = 0; y < h; y += size)
+          // Skip the 1 px border, so smoothing at the tile edge leaves no seam.
+          octx.drawImage(fogTile, 1, 1, 62, 62, x, y, size, size);
+      }
+    }
+    octx.globalCompositeOperation = 'source-atop';
+    octx.globalAlpha = 1;
+    octx.fillStyle = `rgb(${fog.r},${fog.g},${fog.b})`;
+    octx.fillRect(0, 0, w, h);
+    octx.globalCompositeOperation = 'source-over';
+    // Dust: motes that rise and fade in and out over several seconds.
+    const dust = safeColor(hue + 60, 0.2, 0.85);
+    octx.fillStyle = `rgb(${dust.r},${dust.g},${dust.b})`;
+    for (const mote of motes) {
+      const y = (((mote.y - time * mote.speed) % 1) + 1) % 1;
+      octx.globalAlpha =
+        (0.5 + 0.5 * Math.sin(time * 0.4 + mote.phase)) *
+        0.5 *
+        (0.4 + v.trailLength) *
+        fade;
+      octx.beginPath();
+      octx.arc(mote.x * w, y * h, 1.5, 0, Math.PI * 2);
+      octx.fill();
+    }
+    // Grain: always a little, more with typing. It moves with time only.
+    const pattern = octx.createPattern(grainTile, 'repeat');
+    if (pattern !== null) {
+      const shift = Math.floor(time * 97) % 128;
+      octx.globalAlpha = 0.05 * (0.35 + v.grain);
+      octx.globalCompositeOperation = 'overlay';
+      octx.translate(shift, shift);
+      octx.fillStyle = pattern;
+      octx.fillRect(-shift, -shift, w, h);
+      octx.setTransform(1, 0, 0, 1, 0, 0);
+      octx.globalCompositeOperation = 'source-over';
+    }
+    // Vignette: fixed, never pulsing.
+    const vignette = octx.createRadialGradient(
+      w / 2,
+      h / 2,
+      Math.min(w, h) * 0.35,
+      w / 2,
+      h / 2,
+      Math.max(w, h) * 0.75,
+    );
+    vignette.addColorStop(0, 'rgba(0,0,0,0)');
+    vignette.addColorStop(1, 'rgba(0,0,0,0.45)');
+    octx.globalAlpha = 1;
+    octx.fillStyle = vignette;
+    octx.fillRect(0, 0, w, h);
+  }
+
   const ease = (from: number, to: number, tau: number): number =>
     from + (to - from) * Math.min(1, dt / tau);
 
@@ -95,7 +223,10 @@ export function createP5VisualEngine(deps: P5EngineDeps): VisualEngine {
         base.r,
         base.g,
         base.b,
-        (still ? 1 : 0.08 + (1 - v.trailLength) * 0.25) * 255,
+        // Aurora has no trails: its soft fills would build up into a wash.
+        (still || setup.p5Scene === 'aurora'
+          ? 1
+          : 0.08 + (1 - v.trailLength) * 0.25) * 255,
       );
       p.rect(0, 0, w, h);
 
@@ -117,8 +248,12 @@ export function createP5VisualEngine(deps: P5EngineDeps): VisualEngine {
         `rgba(${light.r},${light.g},${light.b},${0.04 * (1 - v.dim)})`,
       );
       gradient.addColorStop(1, `rgba(${light.r},${light.g},${light.b},0)`);
+      // Direct canvas drawing goes inside save() and restore(): p5 caches its
+      // fill colour, and a changed fillStyle would leak into its next fill.
+      glow.save();
       glow.fillStyle = gradient;
       glow.fillRect(0, 0, w, h);
+      glow.restore();
 
       function drawStrokes(count: number, step: number): void {
         for (let i = 0; i < count; i += 1) {
@@ -167,29 +302,46 @@ export function createP5VisualEngine(deps: P5EngineDeps): VisualEngine {
           );
         }
       } else if (setup.p5Scene === 'aurora') {
-        // Curtains: thin vertical lines of low alpha whose tops sway with noise.
+        // Curtains: soft bands whose tops sway with noise. Each curtain is one
+        // filled shape; a horizontal gradient gives its folds (bright in some
+        // places, faint in others). No lines, so no fine stripes.
         const curtains = 2 + Math.round(v.flow * 3);
-        const gap = Math.max(3, Math.round(8 - share * 4));
+        const length = h * (0.12 + v.trailLength * 0.25);
+        const step = 24;
+        const ctx = p.drawingContext as CanvasRenderingContext2D;
+        ctx.save();
         for (let k = 0; k < curtains; k += 1) {
-          for (let x = 0; x < w; x += gap) {
-            const top =
+          const c = safeColor(hue + k * 25 - 20, v.saturation, 0.65);
+          const folds = ctx.createLinearGradient(0, 0, w, 0);
+          for (let i = 0; i <= 16; i += 1) {
+            const fold = p.noise(i * 0.4, k * 7, time * 0.1);
+            const alpha = 0.5 * fold * fold * (1 - v.dim);
+            folds.addColorStop(i / 16, `rgba(${c.r},${c.g},${c.b},${alpha})`);
+          }
+          const tops: number[] = [];
+          for (let x = 0; x <= w + step; x += step) {
+            tops.push(
               h * (0.15 + k * 0.08) +
-              p.noise(x * 0.002, k * 3, time * 0.15) * h * 0.35 +
-              Math.sin(x * 0.004 + time * 0.3 * (k + 1)) *
-                h *
-                0.05 *
-                (0.3 + v.turbulence);
-            // Folds: the curtain is bright in some places and faint in others.
-            const fold = p.noise(x * 0.003, k * 7, time * 0.1);
-            rgb(
-              hue + k * 25 - 20,
-              v.saturation,
-              0.65,
-              0.45 * fold * fold * (1 - v.dim),
+                p.noise(x * 0.002, k * 3, time * 0.15) * h * 0.35 +
+                Math.sin(x * 0.004 + time * 0.3 * (k + 1)) *
+                  h *
+                  0.05 *
+                  (0.3 + v.turbulence),
             );
-            p.line(x, top, x, top + h * (0.12 + v.trailLength * 0.25));
+          }
+          // Two passes, full and half length, so the bottom edge fades out.
+          for (const reach of [1, 0.5]) {
+            ctx.beginPath();
+            tops.forEach((top, i) => ctx.lineTo(i * step, top));
+            for (let i = tops.length - 1; i >= 0; i -= 1) {
+              ctx.lineTo(i * step, (tops[i] ?? 0) + length * reach);
+            }
+            ctx.closePath();
+            ctx.fillStyle = folds;
+            ctx.fill();
           }
         }
+        ctx.restore();
       } else {
         // Strokes along the flow field. Order straightens them; turbulence bends them.
         drawStrokes(count, step);
@@ -234,6 +386,7 @@ export function createP5VisualEngine(deps: P5EngineDeps): VisualEngine {
         p.fill(c.r, c.g, c.b, v.absenceMark * 120);
         p.circle(w * 0.78, h * 0.22, Math.min(w, h) * 0.5);
       }
+      drawAtmosphere(v, hue);
     };
   }, host);
 
@@ -257,6 +410,7 @@ export function createP5VisualEngine(deps: P5EngineDeps): VisualEngine {
     },
     dispose() {
       instance.remove();
+      overlay.remove();
     },
   };
 }

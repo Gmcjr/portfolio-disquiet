@@ -64,7 +64,8 @@ The user asked for a much greater variety of images and sounds.
 
 1. **Banks inside each mood.** The key picks one entry from each bank for each visit:
    - sound: a lead voice (bells, strings, glass, marimba), a bed for held chords (FM, duo, AM,
-     fat saw), a percussion voice (noise, metal, membrane), and an air layer (none, wind, surf);
+     fat saw), a percussion voice (noise, metal, membrane), and an air layer (wind, surf, hush;
+     `none` was removed by Amendment 4);
    - image: a shader scene for psychedelic and glitchy (waves, tunnel, cells, marble, rings),
      and a p5 scene for ethereal (strokes, orbits, aurora).
 2. **The mood is the treatment.** The mood sets the effects, the envelope lengths, and the
@@ -78,6 +79,21 @@ The user asked for a much greater variety of images and sounds.
      public-domain sets for approval). Samples need an ADR-0009 change first: the piece would
      download audio files at the Goodbye click, and ADR-0009 §6 now says "no network code".
      They also need an audio budget in `check:size` and a licence for each file.
+
+## Amendment 4 (2026-10-19, user decision after listening to the banks)
+
+The user asked for more atmosphere, ambience, and texture, in sound and in image.
+
+1. **Sound:** three layers that never stop: the air (every visit has one), a haze pad (root
+   and fifth, held through the piece, breathing through a slow filter), and a texture set by
+   the mood (bright hiss, tape hiss with wobble, or hiss with crackle).
+2. **Image:** drifting haze in two depths, slow dust motes, film grain that never goes to zero,
+   and a fixed vignette.
+3. **Still visitor-made.** Stillness and long dwells make the haze, the air, and the pad rise.
+   Scroll shifts the near haze layer. Typing adds grain. Note density drives the crackle.
+4. **Safety:** the dust fades over seconds, the vignette never moves, and every layer moves
+   only with the image clock, so reduced motion still holds the image. The shader now applies
+   the core no-saturated-red test (`isSaturatedRed`) to every pixel.
 
 ## Source spec
 

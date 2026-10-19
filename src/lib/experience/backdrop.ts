@@ -109,7 +109,7 @@ export function deriveBackdrop(key: string): Backdrop {
     lead: pick(LEADS, banks, 'bells'),
     bed: pick(BEDS, banks, 'fm'),
     percussion: pick(PERCUSSION, banks, 'noise'),
-    air: pick(AIRS, banks, 'none'),
+    air: pick(AIRS, banks, 'hush'),
     shaderScene: pick(SHADER_SCENES, banks, 'waves'),
     p5Scene: pick(P5_SCENES, banks, 'strokes'),
   };

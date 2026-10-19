@@ -2,6 +2,7 @@
 // the same AudioEngine interface. Two things combine:
 //   the sources (the key picks one of each bank): a lead voice for notes, a bed for
 //   held chords, a percussion voice for key presses, and an air layer of noise;
+//   the atmosphere: the air, a haze pad, and a texture that never stop;
 //   the mood (the treatment): psychedelic sends the sources through a phaser, a
 //   wide chorus, and a slow auto-pan; glitchy through a square stutter, distortion,
 //   and short repeats, with short envelopes; ethereal through an octave shimmer and
@@ -31,6 +32,7 @@ import { PingPongDelay } from 'tone/build/esm/effect/PingPongDelay.js';
 import { PitchShift } from 'tone/build/esm/effect/PitchShift.js';
 import { Reverb } from 'tone/build/esm/effect/Reverb.js';
 import { Tremolo } from 'tone/build/esm/effect/Tremolo.js';
+import { Vibrato } from 'tone/build/esm/effect/Vibrato.js';
 import { AMSynth } from 'tone/build/esm/instrument/AMSynth.js';
 import { DuoSynth } from 'tone/build/esm/instrument/DuoSynth.js';
 import { FMSynth } from 'tone/build/esm/instrument/FMSynth.js';
@@ -347,28 +349,79 @@ export function createToneAudioEngine(
   drone.start();
   nodes.push(drone);
 
-  // The air: slow filtered noise. Wind sweeps a band; surf rolls low waves.
-  let air: Noise | null = null;
-  if (setup.air !== 'none') {
-    air = new Noise({
-      type: setup.air === 'wind' ? 'pink' : 'brown',
-      volume: -60,
+  // Atmosphere (ADR-0008 Amendment 4): three layers that never stop, so the space
+  // is never empty. Stillness (droneLevel) makes all three rise.
+  // 1. The air: slow filtered noise. Wind sweeps a band; surf rolls low waves;
+  //    hush is a soft room tone.
+  const AIR = {
+    wind: { noise: 'pink', rate: 0.07, base: 400, octaves: 3, band: true },
+    surf: { noise: 'brown', rate: 0.12, base: 120, octaves: 4, band: false },
+    hush: { noise: 'pink', rate: 0.03, base: 200, octaves: 2, band: false },
+  } as const;
+  const airShape = AIR[setup.air];
+  const air = new Noise({ type: airShape.noise, volume: -60 });
+  const sweep = new AutoFilter({
+    frequency: airShape.rate,
+    baseFrequency: airShape.base,
+    octaves: airShape.octaves,
+    depth: 0.9,
+    filter: {
+      type: airShape.band ? 'bandpass' : 'lowpass',
+      Q: 1,
+      rolloff: -12,
+    },
+  });
+  sweep.start();
+  air.chain(sweep, reverb);
+  air.start();
+  nodes.push(air, sweep);
+
+  // 2. The haze pad: root and fifth, held for the whole piece, breathing through a
+  //    slow filter. Psychedelic adds a tape wobble.
+  const haze = new PolySynth(Synth, {
+    oscillator: { type: 'fattriangle', count: 3, spread: 20 },
+    envelope: { attack: 6, decay: 2, sustain: 1, release: 8 },
+    volume: -60,
+  });
+  const breath = new AutoFilter({
+    frequency: 0.04,
+    baseFrequency: 250,
+    octaves: 3,
+    depth: 0.8,
+    filter: { type: 'lowpass', Q: 1, rolloff: -12 },
+  });
+  breath.start();
+  haze.connect(breath);
+  nodes.push(haze, breath);
+  if (mood === 'psychedelic') {
+    const wobble = new Vibrato({ frequency: 0.4, depth: 0.12 });
+    breath.chain(wobble, tone);
+    nodes.push(wobble);
+  } else {
+    breath.connect(tone);
+  }
+  haze.triggerAttack([hz(setup.rootMidi + 12), hz(setup.rootMidi + 19)], now());
+
+  // 3. The texture, by mood: bright hiss (ethereal), tape hiss (psychedelic), or
+  //    hiss with crackle (glitchy). The crackle follows the note density.
+  const hiss = new Noise({ type: 'white', volume: -60 });
+  const hissFilter = new Filter(
+    mood === 'ethereal' ? 6000 : 3500,
+    mood === 'psychedelic' ? 'bandpass' : 'highpass',
+  );
+  hiss.chain(hissFilter, reverb);
+  hiss.start();
+  nodes.push(hiss, hissFilter);
+  let crackle: NoiseSynth | null = null;
+  if (mood === 'glitchy') {
+    crackle = new NoiseSynth({
+      noise: { type: 'white' },
+      envelope: { attack: 0.001, decay: 0.006, sustain: 0 },
+      volume: -30,
     });
-    const sweep = new AutoFilter({
-      frequency: setup.air === 'wind' ? 0.07 : 0.12,
-      baseFrequency: setup.air === 'wind' ? 400 : 120,
-      octaves: setup.air === 'wind' ? 3 : 4,
-      depth: 0.9,
-      filter: {
-        type: setup.air === 'wind' ? 'bandpass' : 'lowpass',
-        Q: 1,
-        rolloff: -12,
-      },
-    });
-    sweep.start();
-    air.chain(sweep, reverb);
-    air.start();
-    nodes.push(air, sweep);
+    const crackleFilter = new Filter(2000, 'highpass');
+    crackle.chain(crackleFilter, tone);
+    nodes.push(crackle, crackleFilter);
   }
 
   const glider = new MonoSynth({
@@ -427,7 +480,7 @@ export function createToneAudioEngine(
       );
       panner.pan.rampTo(params.pan, 0.2);
       reverb.wet.rampTo(
-        Math.max(params.reverbMix, mood === 'ethereal' ? 0.4 : 0),
+        Math.max(params.reverbMix, mood === 'ethereal' ? 0.45 : 0.3),
         0.6,
       );
       if (delay instanceof PingPongDelay) {
@@ -435,8 +488,16 @@ export function createToneAudioEngine(
       }
       drone.volume.rampTo(-40 + params.droneLevel * 22, 0.8);
       drone.detune.rampTo(params.detuneCents, 0.8);
-      // The air follows the drone: it rises in stillness and long dwells.
-      air?.volume.rampTo(-44 + params.droneLevel * 18, 1.5);
+      // The atmosphere follows the drone: it rises in stillness and long dwells.
+      air.volume.rampTo(-38 + params.droneLevel * 16, 1.5);
+      haze.volume.rampTo(-34 + params.droneLevel * 12, 1.5);
+      hiss.volume.rampTo(-56 + params.droneLevel * 8, 1.5);
+      if (
+        crackle !== null &&
+        rand() < (0.6 + params.noteDensity * 2) * (tickMs / 1000)
+      ) {
+        crackle.triggerAttackRelease(0.01, now());
+      }
       bed.set({ detune: params.detuneCents });
       setChord(params.chord, params.voiceCount);
       if (rand() < params.noteDensity * (tickMs / 1000) * 2) {

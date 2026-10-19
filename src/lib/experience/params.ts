@@ -56,8 +56,8 @@ export type Bed = (typeof BEDS)[number];
 /** The short hits: key presses. */
 export const PERCUSSION = ['noise', 'metal', 'membrane'] as const;
 export type Percussion = (typeof PERCUSSION)[number];
-/** A noise layer under everything. */
-export const AIRS = ['none', 'wind', 'surf'] as const;
+/** A noise layer under everything; every visit has one (ADR-0008 Amendment 4). */
+export const AIRS = ['wind', 'surf', 'hush'] as const;
 export type Air = (typeof AIRS)[number];
 /** The shader image (psychedelic and glitchy moods). */
 export const SHADER_SCENES = [

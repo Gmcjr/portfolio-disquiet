@@ -68,7 +68,7 @@ const SETUP = {
   lead: 'bells' as const,
   bed: 'fm' as const,
   percussion: 'noise' as const,
-  air: 'none' as const,
+  air: 'hush' as const,
   reverbSeconds: 0.1,
 };
 

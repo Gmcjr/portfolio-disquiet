@@ -319,3 +319,17 @@ Follow the steps in order. A step is done only when its verification passes.
   different; the 3 p5 entries looked the same (a pale wash), so the p5 glow and layer wash
   were cut and the scene marks made stronger; after the fix they differ. Six fresh browser
   visits gave six different hues and bank mixes.
+- 2026-10-19 — User listened to the banks: wants "more atmosphere, more ambience, more
+  texture, audibly and visibly". WIP commit `608d04dc` (local, no push) first. Built (uncommitted,
+  ADR-0008 Amendment 4): sound: air in every visit (`none` replaced by `hush`), a haze pad,
+  and a texture layer by mood; image: haze, dust, grain, vignette (shader in-pass; p5 on a
+  cleared overlay canvas). Fixes found on the way: (1) the p5 image washed out because direct
+  canvas drawing changed `fillStyle` behind p5's fill cache; now wrapped in save/restore (this
+  also caused the pale ethereal images before); (2) glitchy cells showed saturated red-pink;
+  the shader now applies the `isSaturatedRed` test per pixel; (3) aurora ran at 24 fps and
+  showed fine stripes; now one soft filled shape per curtain, about 50 fps. Checks: gate passes
+  (Goodbye download 77.4 KB / 100 KB; p5 343.9 KB / 512 KB); Skip to end in each mood goes
+  home with a new record and no errors; reduced motion redraws at most every 4 s; no sampled
+  pixel failed the red test (the random visits may not have hit a red hue). Frame rates in
+  headless Chrome: shader 47–60 fps, p5 32–50 fps. Not yet measured on an iPhone. Next: the
+  user listens.
