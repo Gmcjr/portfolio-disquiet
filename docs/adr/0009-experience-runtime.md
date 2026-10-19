@@ -31,6 +31,15 @@ approved these runtime changes on 2026-10-18:
 - **The dependency rules** change to match: the startup entry may import `recorder.ts` and
   `storage.ts` and their core modules; the engines and the mapping stay lazy.
 
+## Amendment 2 (2026-10-19) — follows ADR-0008 Amendment 2
+
+- The Goodbye engine picks the audio and visual engines by mood. Tone.js is imported module by
+  module, never from `tone` (its main entry starts a `blob:` worker at import time).
+- The p5 engine loads by a second dynamic import from `engine/goodbye.ts`, only for the ethereal
+  image. `check:size` allows this one nested download with its own budget (≤512 KB); the base
+  Goodbye download stays ≤100 KB. A dependency rule keeps p5 out of the base download.
+- On localhost only, `?mood=psychedelic|glitchy|ethereal` overrides the key, for testing.
+
 ## Context
 
 ADR-0008 sets what the experience does. This ADR sets how the code is built. The forces:

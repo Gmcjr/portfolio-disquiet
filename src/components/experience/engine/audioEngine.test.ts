@@ -64,6 +64,7 @@ const SETUP = {
   rootMidi: 21, // A0, very low on purpose: the floor must lift it
   scale: [0, 3, 5, 7, 10],
   waveform: 'sine' as const,
+  mood: 'ethereal' as const,
   reverbSeconds: 0.1,
 };
 

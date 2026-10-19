@@ -49,12 +49,14 @@ export interface AudioSetup {
   scale: readonly number[];
   waveform: 'sine' | 'triangle' | 'sawtooth';
   reverbSeconds: number;
+  mood: 'psychedelic' | 'glitchy' | 'ethereal';
 }
 
 /** What the visual engine needs from the backdrop. */
 export interface VisualSetup {
   paletteHue: number;
   texture: 'grain' | 'flow' | 'strata';
+  mood: 'psychedelic' | 'glitchy' | 'ethereal';
 }
 
 export type Motion = 'full' | 'reduced' | 'paused';

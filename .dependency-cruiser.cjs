@@ -28,9 +28,9 @@ module.exports = {
       name: 'not-to-unresolvable',
       severity: 'error',
       comment:
-        'An unresolved import has no real path, so the path rules cannot check it. Exceptions: astro: virtual modules, and astro/loaders (a package-exports subpath that the resolver does not follow; used by src/content.config.ts).',
+        'An unresolved import has no real path, so the path rules cannot check it. Exceptions: astro: virtual modules, and astro/loaders (a package-exports subpath that the resolver does not follow; used by src/content.config.ts), and p5 (the same resolver limit; engine prototype).',
       from: { path: '^(src|api)/' },
-      to: { couldNotResolve: true, pathNot: '^(astro:|astro/loaders$)' },
+      to: { couldNotResolve: true, pathNot: '^(astro:|astro/loaders$|p5$)' },
     },
     // The experience (ADR-0009 §1, §7).
     {
@@ -117,7 +117,7 @@ module.exports = {
       comment:
         'The audio and visual engines read only parameter frames, never events or the mapping.',
       from: {
-        path: '^src/components/experience/engine/(audio|visual)Engine\\.ts$',
+        path: '^src/components/experience/engine/[A-Za-z0-9]*(audio|visual|Audio|Visual)Engine\\.ts$',
       },
       to: {
         path: '^src/lib/experience/',
@@ -144,6 +144,39 @@ module.exports = {
         pathNot: '^src/components/experience/engine/goodbye\\.ts$',
       },
       to: { path: '^astro:transitions/client$' },
+    },
+    {
+      name: 'experience-p5-one-file',
+      severity: 'error',
+      comment:
+        'Only engine/p5VisualEngine.ts imports p5 (ADR-0009 Amendment 2), so p5 stays in its own download.',
+      from: {
+        pathNot: '^src/components/experience/engine/p5VisualEngine\\.ts$',
+      },
+      to: { path: '^p5$' },
+    },
+    {
+      name: 'experience-p5-lazy',
+      severity: 'error',
+      comment:
+        'Only engine/goodbye.ts loads the p5 engine, and only by dynamic import (ADR-0009 Amendment 2).',
+      from: { path: '^src/components/experience/engine/goodbye\\.ts$' },
+      to: {
+        path: '^src/components/experience/engine/p5VisualEngine\\.ts$',
+        dependencyTypesNot: ['dynamic-import'],
+      },
+    },
+    {
+      name: 'experience-p5-single-loader',
+      severity: 'error',
+      comment: 'No file except engine/goodbye.ts imports the p5 engine.',
+      from: {
+        pathNot:
+          '^src/components/experience/engine/(goodbye|p5VisualEngine)\\.ts$',
+      },
+      to: {
+        path: '^src/components/experience/engine/p5VisualEngine\\.ts$',
+      },
     },
     {
       name: 'experience-isolated',

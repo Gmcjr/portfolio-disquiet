@@ -10,6 +10,11 @@ export type ScaleName =
   'minor-pentatonic' | 'major-pentatonic' | 'dorian' | 'aeolian';
 export type Emergence = 'gradual' | 'sudden';
 export type Ending = 'whiteout' | 'blackout';
+export type Mood = 'psychedelic' | 'glitchy' | 'ethereal';
+
+export const MOODS: readonly Mood[] = ['psychedelic', 'glitchy', 'ethereal'];
+/** About 1 visit in 4 gets a sound mood that differs from its image mood. */
+export const CROSSED_MOOD_SHARE = 0.25;
 
 export const SCALES: Readonly<Record<ScaleName, readonly number[]>> = {
   'minor-pentatonic': [0, 3, 5, 7, 10],
@@ -34,6 +39,10 @@ export interface Backdrop {
   emergence: Emergence;
   /** backdrop-ending: how Goodbye ends. */
   ending: Ending;
+  /** backdrop-mood: the style of the image (ADR-0008 Amendment 2). */
+  visualMood: Mood;
+  /** backdrop-mood: the style of the sound; mostly the same as the image. */
+  audioMood: Mood;
   /** Row long-stillness: one breath cycle, 6–10 s (user decision). */
   breathMs: number;
   /** Row page-dwell: time between new voices, 15–30 s (user decision). */
@@ -53,6 +62,11 @@ export function deriveBackdrop(key: string): Backdrop {
   const b = createPRNG(key.slice(16, 32));
   const c = createPRNG(key.slice(32, 48));
   const d = createPRNG(key.slice(48, 64));
+  const m = createPRNG(key.slice(4, 20));
+  const visualMood = pick(MOODS, m, 'ethereal');
+  const others = MOODS.filter((mood) => mood !== visualMood);
+  const audioMood =
+    m() < CROSSED_MOOD_SHARE ? pick(others, m, visualMood) : visualMood;
   const scales = Object.keys(SCALES) as ScaleName[];
   return {
     paletteHue: Math.floor(a() * 360),
@@ -66,6 +80,8 @@ export function deriveBackdrop(key: string): Backdrop {
     breathMs: between(d, 6000, 10000),
     voiceJoinMs: between(d, 15000, 30000),
     seasonMs: between(d, 60000, 240000),
+    visualMood,
+    audioMood,
   };
 }
 

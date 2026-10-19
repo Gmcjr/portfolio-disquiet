@@ -42,6 +42,22 @@ This amendment overrides the sections below where they disagree.
    - The footer line "This site stores no personal data" becomes false. Planner default:
      change it with the privacy text.
 
+## Amendment 2 (2026-10-19, user decisions after the engine prototypes)
+
+1. **Moods.** Each visit gets a mood for the image and a mood for the sound: psychedelic,
+   glitchy, or ethereal. The key picks them. They are mostly matched: about 1 visit in 4 gets a
+   different sound mood than its image mood. The mapping rows apply in every mood; the mood sets
+   the style only.
+2. **Libraries.** Tone.js is allowed for the sound (this replaces decision 4 for audio). p5.js is
+   allowed for the ethereal image only. Psychedelic and glitchy images use a WebGL shader. The
+   Web Audio and Canvas 2D engines stay as fallbacks.
+3. **Budgets** (this replaces decision 5 for the Goodbye code): the code that loads at the
+   Goodbye click stays ≤100 KB gzip. p5 loads in a second, separate download, only for visits
+   with the ethereal image, ≤512 KB gzip.
+4. **Safety stays:** at most 3 bright flashes per second in every mood (glitchy included), the
+   master gain limit, and the 40 Hz floor. Tone.js runs with a timer clock and no worklet-based
+   modules, so the CSP does not change.
+
 ## Source spec
 
 The user's raw note, `docs/notes/experience-raw-note.md`, is the spec. Read it in full before

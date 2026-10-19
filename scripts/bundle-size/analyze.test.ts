@@ -99,16 +99,25 @@ describe('analyze', () => {
     expect(failures(result).join()).toMatch(/after click/);
   });
 
-  it('fails on a nested import() in the after-click code', () => {
-    const result = run(
-      {
-        [LAYER_CHUNK]: bootstrap,
-        [ENGINE_CHUNK]: file('const d=()=>import(`./detour.X.js`);', 5 * KB),
-        '_astro/detour.X.js': file('x', KB),
-      },
-      page([LAYER_CHUNK], true),
+  it('budgets a second download on its own, and fails a third', () => {
+    const files = {
+      [LAYER_CHUNK]: bootstrap,
+      [ENGINE_CHUNK]: file('const d=()=>import(`./p5.X.js`);', 5 * KB),
+      '_astro/p5.X.js': file('x', 400 * KB),
+    };
+    expect(failures(run(files, page([LAYER_CHUNK], true)))).toEqual([]);
+    const over = { ...files, '_astro/p5.X.js': file('x', 600 * KB) };
+    expect(failures(run(over, page([LAYER_CHUNK], true))).join()).toMatch(
+      /second download/,
     );
-    expect(failures(result).join()).toMatch(/nested import/);
+    const third = {
+      ...files,
+      '_astro/p5.X.js': file('const e=()=>import(`./more.Y.js`);', KB),
+      '_astro/more.Y.js': file('x', KB),
+    };
+    expect(failures(run(third, page([LAYER_CHUNK], true))).join()).toMatch(
+      /third download/,
+    );
   });
 
   it('fails when a page has the layer but no bootstrap script', () => {

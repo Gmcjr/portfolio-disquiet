@@ -273,3 +273,30 @@ Follow the steps in order. A step is done only when its verification passes.
   line and two closing lines, then "Remember?"; the key picks one per visit. A test checks that
   every phrase is verbatim in the raw note. "Show all text" lists only the visit's variant.
   182 tests, lint, typecheck, and depcruise pass.
+- 2026-10-19 — Engine prototypes on branch `step6-engine-proto` (uncommitted): A = current Web
+  Audio + Canvas; B = Tone.js 15.1.22 + p5 2.3.4; C = Tone.js + a WebGL shader. All behind the
+  same engine interfaces; `?piece=a|b|c` selects one on localhost only. Tone is imported module
+  by module (its main entry starts a blob: worker that the CSP blocks) with a timer clock and no
+  worklet-based synths. Under the real `vercel.json` headers all three run with no CSP errors;
+  p5 logs Permissions-Policy warnings for motion sensors. Goodbye download (gzip): A ≈ 9 KB,
+  B ≈ 480 KB (p5 alone 412 KB), C ≈ 71 KB; budget 40 KB. The CSP, dependency, and lint rules
+  already allow the libraries; the budget and ADR-0008 decision 4 do not. User decision: keep the
+  rules unchanged until the user has listened to A, B, and C.
+- 2026-10-19 — User decisions after the prototypes: keep all three engines; each visit gets a
+  mood (psychedelic, glitchy, ethereal) for image and sound, picked by the key, mostly matched
+  (about 1 in 4 crossed); Tone.js allowed for sound; p5 allowed for the ethereal image only, as
+  a separate download. Recorded as ADR-0008 Amendment 2 and ADR-0009 Amendment 2. Budgets: base
+  Goodbye download ≤100 KB; the p5 download ≤512 KB. Tone modules that use worklets are excluded
+  (BitCrusher, Freeverb, JCReverb, comb filters, PluckSynth).
+- 2026-10-19 — Amendment 2 built (uncommitted, branch `step6-engine-proto`): moods in
+  `backdrop.ts`; mood engines in `goodbye.ts` (Tone.js sound; shader image for psychedelic and
+  glitchy; p5 image for ethereal, by a second dynamic import; Web Audio and Canvas 2D fallbacks).
+  `check:size` budgets the second download on its own and fails a third. Three dependency rules
+  keep p5 in `p5VisualEngine.ts`, loaded only by dynamic import from `goodbye.ts` (a static
+  import was tried and failed the rule). Gate: lint, format, typecheck, depcruise, test, build,
+  `check:size`, and the secret scan pass. Sizes (gzip): startup 4.9 KB (WARN, ceiling 5 KB);
+  Goodbye download 74.1 KB / 100 KB; p5 download 342.6 KB / 512 KB. Browser test under the
+  `vercel.json` headers with `?mood=` on `/work/`: the dialog opens in each mood; psychedelic and
+  glitchy draw on WebGL; ethereal draws on a p5 canvas. No CSP errors. Ethereal logs 2 p5
+  motion-sensor Permissions-Policy errors (p5 asks for the sensors; the policy blocks them).
+  Next: the user listens to all three moods.

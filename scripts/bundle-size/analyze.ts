@@ -10,13 +10,17 @@ export const JS_BUDGETS: Readonly<Record<string, number>> = {
   '/contact/': 16 * KB,
 };
 /** JS that loads after a click (the experience engine after Enter). */
-export const AFTER_CLICK_DEFAULT = 40 * KB;
+/** ADR-0008 Amendment 2: the Goodbye download (Tone.js and the shader). */
+export const AFTER_CLICK_DEFAULT = 100 * KB;
 export const AFTER_CLICK_BUDGETS: Readonly<Record<string, number>> = {};
 export const FONT_BUDGET = 120 * KB;
 export const BOOTSTRAP_TARGET = 2 * KB;
 export const BOOTSTRAP_CEILING = 5 * KB;
-/** Phase A (ADR-0008): the engine loads in one piece. Phase B sets this to true. */
-export const NESTED_LAZY_ALLOWED = false;
+/**
+ * ADR-0008 Amendment 2: the Goodbye code may load one more download (p5, for the
+ * ethereal image only), with its own budget. A download inside that one fails.
+ */
+export const NESTED_LAZY_BUDGET = 512 * KB;
 /** Astro's chunk name for the first <script> of ExperienceLayer.astro. */
 export const BOOTSTRAP_ENTRY =
   /(^|\/)ExperienceLayer\.astro_astro_type_script_index_0_lang\.[\w-]+\.js$/;
@@ -145,12 +149,23 @@ export function analyze(input: AnalyzeInput): {
     if (afterBytes > afterBudget) fail(`FAIL ${afterLine}`);
     else if (after.size > 0) lines.push(`ok   ${afterLine}`);
 
-    for (const file of after) {
-      if (parseImports(files.get(file)?.code ?? '', 'dynamic').length === 0)
-        continue;
-      if (NESTED_LAZY_ALLOWED)
-        lines.push(`info lazy ${route} ${file} (not budgeted)`);
-      else fail(`FAIL lazy ${name} ${file} has a nested import()`);
+    const nestedEntries = [...after].flatMap((file) =>
+      parseImports(files.get(file)?.code ?? '', 'dynamic').map((spec) =>
+        resolveFrom(file, spec),
+      ),
+    );
+    if (nestedEntries.length > 0) {
+      const nested = closure(nestedEntries, files);
+      for (const file of [...startup, ...after]) nested.delete(file);
+      const nestedBytes = bytesOf(nested, files);
+      const nestedLine = `JS   ${`${route} (second download)`.padEnd(24)} ${kb(nestedBytes)} / ${kb(NESTED_LAZY_BUDGET)}`;
+      if (nestedBytes > NESTED_LAZY_BUDGET) fail(`FAIL ${nestedLine}`);
+      else lines.push(`ok   ${nestedLine}`);
+      for (const file of nested) {
+        if (parseImports(files.get(file)?.code ?? '', 'dynamic').length > 0) {
+          fail(`FAIL lazy ${name} ${file} loads a third download`);
+        }
+      }
     }
 
     if (!html.includes(LAYER_MARKER)) continue;

@@ -128,6 +128,24 @@ describe('key', () => {
 });
 
 describe('backdrop', () => {
+  it('picks every mood, mostly matched, sometimes crossed', () => {
+    const rand = createPRNG(SEED_A);
+    const visual = new Set<string>();
+    let crossed = 0;
+    const runs = 2000;
+    for (let run = 0; run < runs; run += 1) {
+      const key = Array.from({ length: 64 }, () =>
+        Math.floor(rand() * 16).toString(16),
+      ).join('');
+      const b = deriveBackdrop(key);
+      visual.add(b.visualMood);
+      if (b.audioMood !== b.visualMood) crossed += 1;
+    }
+    expect([...visual].sort()).toEqual(['ethereal', 'glitchy', 'psychedelic']);
+    expect(crossed / runs).toBeGreaterThan(0.18);
+    expect(crossed / runs).toBeLessThan(0.32);
+  });
+
   it('is the same for the same key and differs between keys', () => {
     expect(deriveBackdrop(SEED_A)).toEqual(deriveBackdrop(SEED_A));
     expect(deriveBackdrop(SEED_A)).not.toEqual(deriveBackdrop(SEED_B));

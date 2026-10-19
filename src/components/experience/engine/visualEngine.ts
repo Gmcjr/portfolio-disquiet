@@ -42,6 +42,8 @@ export interface VisualEngine {
     still: boolean,
     particleShare: number,
   ): void;
+  /** Frees the canvas and any library state. Called when Goodbye ends. */
+  dispose?(): void;
 }
 
 const MAX_PARTICLES = 140;

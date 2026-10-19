@@ -23,6 +23,8 @@ import {
 import { summarize } from '../../../lib/experience/summary';
 import type { VisitRecord } from '../record/recording';
 import { createAudioEngine, type AudioEngine } from './audioEngine';
+import { createShaderVisualEngine } from './shaderVisualEngine';
+import { createToneAudioEngine } from './toneAudioEngine';
 import { createVisualEngine, type VisualEngine } from './visualEngine';
 
 const MAX_PIXELS = 2_000_000;
@@ -95,36 +97,84 @@ export async function playGoodbye(
   const cues = buildCues(backdrop, calm, showcaseMs, variant);
   const seal = await computeSeal(visit.key, visit.events);
 
-  // Engines.
-  const canvas = mountCanvas(
-    layer.querySelector<HTMLElement>('[data-exp-canvas-host]'),
-  );
-  const ctx2d = canvas.getContext('2d', { alpha: false });
-  if (ctx2d === null) warn('canvas-unavailable');
-  const visual: VisualEngine | null =
-    ctx2d === null
+  // Engines, by mood (ADR-0008 Amendment 2). On localhost only, ?mood= overrides
+  // the key, for testing. The ethereal image loads p5 as a separate download.
+  const local = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+  const asked = local
+    ? new URLSearchParams(window.location.search).get('mood')
+    : null;
+  const override =
+    asked === 'psychedelic' || asked === 'glitchy' || asked === 'ethereal'
+      ? asked
+      : null;
+  const visualMood = override ?? backdrop.visualMood;
+  const audioMood = override ?? backdrop.audioMood;
+  const host = layer.querySelector<HTMLElement>('[data-exp-canvas-host]');
+  const visualSetup = {
+    paletteHue: backdrop.paletteHue,
+    texture: backdrop.texture,
+    mood: visualMood,
+  };
+  const audioSetup = {
+    rootMidi: backdrop.rootMidi,
+    scale: SCALES[backdrop.scale],
+    waveform: backdrop.waveform,
+    reverbSeconds: backdrop.reverbSeconds,
+    mood: audioMood,
+  };
+  const canvasEngine = (canvas: HTMLCanvasElement): VisualEngine | null => {
+    const ctx2d = canvas.getContext('2d', { alpha: false });
+    return ctx2d === null
       ? null
       : createVisualEngine({
           ctx: ctx2d,
           size: () => ({ width: canvas.width, height: canvas.height }),
-          setup: { paletteHue: backdrop.paletteHue, texture: backdrop.texture },
+          setup: visualSetup,
           rand: createPRNG(visit.key.slice(16)),
           safeColor,
         });
+  };
+  let visual: VisualEngine | null = null;
+  if (visualMood === 'ethereal' && host !== null) {
+    try {
+      const { createP5VisualEngine } = await import('./p5VisualEngine');
+      host.replaceChildren();
+      visual = createP5VisualEngine({
+        host,
+        setup: visualSetup,
+        rand: createPRNG(visit.key.slice(16)),
+        safeColor,
+      });
+    } catch {
+      warn('engine-load-failed');
+    }
+  }
+  if (visual === null) {
+    const canvas = mountCanvas(host);
+    visual =
+      visualMood === 'ethereal'
+        ? canvasEngine(canvas)
+        : (createShaderVisualEngine(canvas, visualSetup) ??
+          canvasEngine(mountCanvas(host)));
+  }
+  if (visual === null) warn('canvas-unavailable');
   let audio: AudioEngine | null = null;
-  if (audioContext !== null) {
-    audio = createAudioEngine(
-      audioContext,
-      {
-        rootMidi: backdrop.rootMidi,
-        scale: SCALES[backdrop.scale],
-        waveform: backdrop.waveform,
-        reverbSeconds: backdrop.reverbSeconds,
-      },
-      createPRNG(visit.key.slice(48)),
-    );
-  } else {
+  if (audioContext === null) {
     warn('audio-unavailable');
+  } else {
+    try {
+      audio = createToneAudioEngine(
+        audioContext,
+        audioSetup,
+        createPRNG(visit.key.slice(48)),
+      );
+    } catch {
+      audio = createAudioEngine(
+        audioContext,
+        audioSetup,
+        createPRNG(visit.key.slice(48)),
+      );
+    }
   }
   const voice = localVoice();
   if (voice === null) warn('speech-unavailable');
@@ -305,6 +355,7 @@ export async function playGoodbye(
     finished = true;
     if (voice !== null) speechSynthesis.cancel();
     audio?.close();
+    visual?.dispose?.();
     dialog?.removeEventListener('click', onControl);
     dialog?.removeEventListener('cancel', onCancel);
     document.removeEventListener(
