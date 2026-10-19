@@ -10,14 +10,14 @@
     "build": "astro build",
     "preview": "astro preview",
     "typecheck": "astro check && tsc --noEmit",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "depcruise": "depcruise src api --config",
     "test": "vitest run",
     "prepare": "lefthook install",
-    "guard:secrets": "grep -R \"RESEND_API_KEY\" -n src public && echo \"Secret found\" && exit 1 || exit 0",
+    "scan:secrets": "bun scripts/scan-secrets.ts",
     "check:size": "bun scripts/check-bundle-size.ts"
   },
   "dependencies": {

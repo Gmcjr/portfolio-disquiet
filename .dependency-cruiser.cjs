@@ -20,9 +20,141 @@ module.exports = {
       name: 'crosscutting-no-ui',
       severity: 'error',
       comment:
-        'Cross-cutting modules (src/config, src/lib/seo.ts, src/lib/analytics.ts) must not import UI - see ARCHITECTURE.md #4 / ADR-0003.',
-      from: { path: '^src/(config/|lib/(seo|analytics)\\.ts$)' },
+        'Cross-cutting modules (src/config/ and the top-level files in src/lib/) must not import UI - see ARCHITECTURE.md #4 / ADR-0003.',
+      from: { path: '^src/(config/|lib/[^/]+\\.ts$)' },
       to: { path: '^src/(components|layouts|pages)/' },
+    },
+    {
+      name: 'not-to-unresolvable',
+      severity: 'error',
+      comment:
+        'An unresolved import has no real path, so the path rules cannot check it. Exceptions: astro: virtual modules, and astro/loaders (a package-exports subpath that the resolver does not follow; used by src/content.config.ts).',
+      from: { path: '^(src|api)/' },
+      to: { couldNotResolve: true, pathNot: '^(astro:|astro/loaders$)' },
+    },
+    // The experience (ADR-0009 §1, §7).
+    {
+      name: 'experience-core-pure',
+      severity: 'error',
+      comment:
+        'The experience core imports nothing outside src/lib/experience/ (ADR-0009 §1).',
+      from: { path: '^src/lib/experience/', pathNot: '\\.test\\.ts$' },
+      to: { pathNot: '^src/lib/experience/' },
+    },
+    {
+      name: 'experience-core-tests',
+      severity: 'error',
+      comment: 'Core tests import only core modules and vitest.',
+      from: { path: '^src/lib/experience/.+\\.test\\.ts$' },
+      to: { pathNot: '^src/lib/experience/|(^|/)node_modules/vitest/' },
+    },
+    {
+      name: 'experience-bootstrap-lazy',
+      severity: 'error',
+      comment:
+        'The startup script loads the engine only by dynamic import, after Enter (ADR-0009 §2).',
+      from: { path: '^src/components/experience/bootstrap\\.ts$' },
+      to: {
+        path: '^src/components/experience/(engine|detour)/',
+        dependencyTypesNot: ['dynamic-import'],
+      },
+    },
+    {
+      name: 'experience-bootstrap-core-subset',
+      severity: 'error',
+      comment:
+        'The startup script reaches only events.ts and envelope.ts in the core, to stay small.',
+      from: { path: '^src/components/experience/bootstrap\\.ts$' },
+      to: {
+        path: '^src/lib/experience/',
+        pathNot: '^src/lib/experience/(events|envelope)\\.ts$',
+      },
+    },
+    {
+      name: 'experience-envelope-leaf',
+      severity: 'error',
+      comment:
+        'envelope.ts is on the startup path, so it imports only events.ts.',
+      from: { path: '^src/lib/experience/envelope\\.ts$' },
+      to: {
+        path: '^src/lib/experience/',
+        pathNot: '^src/lib/experience/events\\.ts$',
+      },
+    },
+    {
+      name: 'experience-timeline-leaf',
+      severity: 'error',
+      comment: 'timeline.ts imports only events.ts and envelope.ts.',
+      from: { path: '^src/lib/experience/timeline\\.ts$' },
+      to: {
+        path: '^src/lib/experience/',
+        pathNot: '^src/lib/experience/(events|envelope)\\.ts$',
+      },
+    },
+    {
+      name: 'experience-engines-params-only',
+      severity: 'error',
+      comment:
+        'The audio and visual engines read only parameter frames, never events or the mapping.',
+      from: {
+        path: '^src/components/experience/engine/(audio|visual)Engine\\.ts$',
+      },
+      to: {
+        path: '^src/lib/experience/',
+        pathNot: '^src/lib/experience/params\\.ts$',
+      },
+    },
+    {
+      name: 'experience-recorder-events-only',
+      severity: 'error',
+      comment: 'The recorder produces events and knows nothing else.',
+      from: { path: '^src/components/experience/engine/recorder\\.ts$' },
+      to: {
+        path: '^src/lib/experience/',
+        pathNot: '^src/lib/experience/events\\.ts$',
+      },
+    },
+    {
+      name: 'experience-navigate-goodbye-only',
+      severity: 'error',
+      comment:
+        'Only engine/goodbye.ts imports astro:transitions/client (the end navigation).',
+      from: {
+        path: '^src/components/experience/',
+        pathNot: '^src/components/experience/engine/goodbye\\.ts$',
+      },
+      to: { path: '^astro:transitions/client$' },
+    },
+    {
+      name: 'experience-isolated',
+      severity: 'error',
+      comment: 'No code outside the experience imports experience modules.',
+      from: {
+        path: '^(src|api)/',
+        pathNot: '^src/(lib|components|pages)/experience/',
+      },
+      to: { path: '^src/(lib|components)/experience/' },
+    },
+    {
+      name: 'detour-loader-lazy',
+      severity: 'error',
+      comment:
+        'Phase B: only engine/session.ts loads the detour, and only by dynamic import.',
+      from: { path: '^src/components/experience/engine/session\\.ts$' },
+      to: {
+        path: '^src/components/experience/detour/',
+        dependencyTypesNot: ['dynamic-import'],
+      },
+    },
+    {
+      name: 'detour-single-loader',
+      severity: 'error',
+      comment: 'No engine module except session.ts imports the detour.',
+      from: {
+        path: '^src/components/experience/engine/',
+        pathNot: 'session\\.ts$',
+      },
+      to: { path: '^src/components/experience/detour/' },
     },
     {
       name: 'api-isolation',
