@@ -189,3 +189,10 @@ Follow the steps in order. A step is done only when its verification passes.
   user decision needed).
 - 2026-10-18 — User decisions: commit PR-A as 4 commits and open a PR (no merge); the
   `bun audit` CI step comes in a separate later PR that first updates the dependencies.
+- 2026-10-18 — PR #2 (`step6-pr-a`, 4 commits) opened. CI passes (5 min 4 s), Lighthouse
+  included. Preview check through `vercel curl` (the preview needs a Vercel login): the CSP has
+  `worker-src 'none'` and `frame-ancestors 'none'`; `Referrer-Policy` is
+  `strict-origin-when-cross-origin`; `Permissions-Policy` has the 3 new entries. All 6 real
+  pages return 200; `/experience/` returns 404, as planned until PR-B. Not checked in a browser:
+  the console for CSP errors. The new CSP directives restrict only workers and framing, which
+  the site does not use. Waiting for the user to review and merge PR #2.
