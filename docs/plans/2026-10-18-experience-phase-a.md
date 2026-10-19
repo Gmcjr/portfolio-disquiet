@@ -5,9 +5,10 @@ date: 2026-10-18
 
 # Experience, Phase A — detail plan for recovery Step 6
 
-**Status:** In progress — the detail plan for Step 6 of `docs/plans/2026-10-16-recovery.md`.
-Planning done 2026-10-18. Step A0 done: ADR-0008 and ADR-0009 accepted. Step A1 (PR-A) built
-locally on branch `step6-pr-a`; next: commit, PR, and CI.
+**Status:** Paused (user decision, 2026-10-19). This copy on `main` is out of date. The
+current version, with the progress log through 2026-10-19, is on the local branch
+`step6-engine-proto`: `git show step6-engine-proto:docs/plans/2026-10-18-experience-phase-a.md`.
+See §0 of `docs/plans/2026-10-16-recovery.md`.
 
 Sources: the user's raw note (`docs/notes/experience-raw-note.md`), ADR-0008 (what), ADR-0009
 (how). This plan came from a Blueprint planning run on 2026-10-18 (architecture, frontend,
