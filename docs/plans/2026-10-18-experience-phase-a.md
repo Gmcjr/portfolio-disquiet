@@ -5,9 +5,12 @@ date: 2026-10-18
 
 # Experience, Phase A — detail plan for recovery Step 6
 
-**Status:** In progress — the detail plan for Step 6 of `docs/plans/2026-10-16-recovery.md`.
-Planning done 2026-10-18. Step A0 done: ADR-0008 and ADR-0009 accepted. Step A1 done (PR #2
-merged). Step A2 (PR-B, the layer) in progress on branch `step6-pr-b`.
+**Status:** Paused (user decision, 2026-10-19). Step A1 (PR-A) done (PR #2). Step A2 (PR-B)
+and the sound and image work are local WIP commits on this branch, `step6-engine-proto`, not
+pushed: recording from arrival, the Goodbye piece, message variants, moods, banks, atmosphere,
+and an own Hydra-style engine (ADR-0008 and ADR-0009 Amendments 1–5). When Step 6 resumes,
+start from the last entries of §7 (the progress log) and their open items. Step A3 (PR-C) not
+started.
 
 Sources: the user's raw note (`docs/notes/experience-raw-note.md`), ADR-0008 (what), ADR-0009
 (how). This plan came from a Blueprint planning run on 2026-10-18 (architecture, frontend,
