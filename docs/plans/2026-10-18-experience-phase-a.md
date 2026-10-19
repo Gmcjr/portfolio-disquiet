@@ -5,10 +5,13 @@ date: 2026-10-18
 
 # Experience, Phase A — detail plan for recovery Step 6
 
-**Status:** Paused (user decision, 2026-10-19). This copy on `main` is out of date. The
-current version, with the progress log through 2026-10-19, is on the local branch
-`step6-engine-proto`: `git show step6-engine-proto:docs/plans/2026-10-18-experience-phase-a.md`.
-See §0 of `docs/plans/2026-10-16-recovery.md`.
+**Status:** Paused (user decision, 2026-10-19). Step A1 (PR-A) done (PR #2). The notes here
+are current to 2026-10-19. The code for Step A2 (PR-B) and the sound and image work is on
+branch `step6-engine-proto` (WIP commits, pushed to GitHub as a backup, not merged): recording
+from arrival, the Goodbye piece, message variants, moods, banks, atmosphere, and an own
+Hydra-style engine (ADR-0008 and ADR-0009 Amendments 1–5). The amendments describe that
+branch, not `main`. When Step 6 resumes, check out that branch and start from the last entries
+of §7 (the progress log) and their open items. Step A3 (PR-C) not started.
 
 Sources: the user's raw note (`docs/notes/experience-raw-note.md`), ADR-0008 (what), ADR-0009
 (how). This plan came from a Blueprint planning run on 2026-10-18 (architecture, frontend,
@@ -197,3 +200,160 @@ Follow the steps in order. A step is done only when its verification passes.
   pages return 200; `/experience/` returns 404, as planned until PR-B. Not checked in a browser:
   the console for CSP errors. The new CSP directives restrict only workers and framing, which
   the site does not use. Waiting for the user to review and merge PR #2.
+- 2026-10-18 — Step A1 done. PR #2 merged into `main` (`9a460afc`, merge commit) after CI passed
+  on the last commit. Production deploy `pivirjg1t` smoke test: the 6 real pages 200;
+  `/experience/` and `/writing/` 404; `robots.txt` and the sitemap 200; the new CSP,
+  `Referrer-Policy`, and `Permissions-Policy` headers present; the contact function returns 422
+  for an invalid post. Step A2 (PR-B) started on branch `step6-pr-b`.
+- 2026-10-18 — Step A2 (PR-B) slices 1–4 built on `step6-pr-b`, not committed.
+  - Slice 1: skip link, `main#main`, global `:focus-visible` with a `--focus-ring` token (dark
+    accent, light ink), a reduced-motion rule for page UI, and a `.plate` class on each page's
+    content column and on the footer. Lighthouse unchanged: accessibility and SEO 1.0 on all
+    pages; the same CLS values as before (home 0.0565, the known local failure).
+  - Slices 2–3: `engine/ports`, `storage` (incremental writes, memory fallback), `recorder`
+    (narrow event types, form fields and the layer excluded), `session` (one tick, page changes,
+    flush on hide), `audioEngine` (factory over a fake-able context; a test proves the master gain
+    stays ≤0.15 and no frequency goes below 40 Hz), `visualEngine` (full colour, brightness ramps
+    ≥800 ms). 23 shell tests in jsdom. A deliberate key read made the recorder test fail.
+  - Slice 4: `ExperienceLayer.astro` (persisted, no view-transition name), `ExperienceControl`,
+    `start.ts` (the one import; a window symbol guards a second copy), `bootstrap.ts`,
+    `contract.ts` (shared types; avoids an import cycle), `engine/index.ts`, `controls.ts`,
+    `experience.css`, and the `/experience` page (panels by CSS, the security planner's draft
+    consent text, `noindex`). New layer state `resumable`: a stored live visit waits for
+    Continue; in that state Goodbye loads the engine to end the visit and delete the record.
+    `check:size`: startup script 2.0 KB (target 2 KB); after-Enter code 10.8 KB of 40 KB.
+  - Browser check (static build, Playwright): before Enter no engine file and no record; first
+    Tab focuses the skip link; Enter → live; the record holds the expected events; the canvas
+    survives a page change; `view-transition-name` is `none`; no console errors; no off-site
+    requests. Goodbye is a placeholder (ends the visit, deletes the record) until slice 6.
+  - Not added to Lighthouse CI: `/experience/` (it has `noindex` until PR-C; add it then).
+- 2026-10-18 — Checkpoint (slice 5) with the user. The user: the live layer "feels ok" but must
+  not run during the visit. User decisions: no live sound or image; every visit is recorded
+  from arrival (no Enter step); all input maps to parameters that play back only after Time to
+  Say Goodbye; after playback the record is gone; a small Goodbye bar on every page. Recorded as
+  ADR-0008 Amendment 1 (accepted, user decisions) and ADR-0009 Amendment 1 (proposed runtime
+  changes). Open decisions with defaults are listed in ADR-0008 Amendment 1. The slices 1–4 code
+  needs rework before slice 6.
+- 2026-10-19 — Rework for ADR-0008/0009 Amendment 1, plus slice 6 (Goodbye), on `step6-pr-b`,
+  not committed. User decisions (2026-10-18): remove the reading plates; remove `/experience`;
+  after Goodbye, fade back in on the home page and start a new visit; approve the ADR-0009
+  amendment.
+  - Plates and the `/experience` page removed. The live session, controls, and tick removed.
+  - `record/` (startup code): `recorder`, `storage` (raw events; parses nothing), `recording`
+    (records from arrival; on a continued visit it loads `timeline-read.ts` lazily and queues new
+    events; ignores Astro's first-load page event), `ports`. `bootstrap.ts` + `start.ts`: start
+    the recording; at the Goodbye click create the AudioContext, stop the recording, load the
+    engine, then delete the record and start a new visit.
+  - `engine/goodbye.ts`: the full sequence in a modal `<dialog>`: dark, the note's messages one
+    at a time (spoken with an on-device voice when one exists), the showcase replay through the
+    mapping with sound and full-colour image, "Remember?", whiteout or blackout, then a black
+    cover, `navigate('/')`, and a fade in. Pause, Mute, Show all text (messages, visit summary,
+    visit seal), Skip to end; Escape skips; a page change during Goodbye ends it.
+  - Key derivation now orders the hashes by a hash rank (no generator at startup); the parser
+    split out of `timeline.ts`; a new lazy-parser dependency rule.
+  - Privacy page: new section `#experience` (the security planner's draft, adapted; the user
+    edits the wording). Footer line replaced ("Nothing about you leaves your browser unless you
+    send the contact form."). Both were open decisions; these are the planner defaults.
+  - Verification: lint, format, typecheck, depcruise, all tests (21 shell tests), build, secret
+    scan pass. `check:size`: startup script 4.9 KB (WARN: over the 2 KB target, under the 5 KB
+    ceiling); content pages 11.5 KB of 12 KB at startup; Goodbye code 9.3 KB of 40 KB. Browser
+    run (static build): on arrival no canvas and no engine; the record grows while browsing;
+    Goodbye opens the dark stage with the first message and a canvas; Show all text lists the
+    messages, the summary, and the seal; Skip ends on `/` with a new recording; only same-origin
+    requests; the only warning is `speech-unavailable` (no on-device voice in the test browser).
+  - Not built yet: a jsdom test of the Goodbye end order (`goodbye.ts` has no ports; the browser
+    run covers it); the user's listening test.
+- 2026-10-19 — Lighthouse with the Goodbye bar on every page: performance, accessibility, and
+  SEO 1.0 on all 8 pages; CLS unchanged (home 0.0565, the known local failure that `main` also
+  shows; the other pages 0.019–0.033).
+- 2026-10-19 — User test of the Goodbye piece: "getting better". User decisions: prototype
+  other sound and image engines (2–3 variants with libraries, compared in the browser); draft
+  short message variants from phrases in the note (the key picks one per visit; the user edits
+  the words later). Work so far saved as one local WIP commit on `step6-pr-b` (not pushed);
+  prototypes go on branch `step6-engine-proto`. The project's Vercel "automation bypass" secret
+  dates from 2026-10-17 (not created by this session's checks); the user decides whether to
+  revoke it.
+- 2026-10-19 — Message variants built (uncommitted): 6 drafts in `script.ts`, each one opening
+  line and two closing lines, then "Remember?"; the key picks one per visit. A test checks that
+  every phrase is verbatim in the raw note. "Show all text" lists only the visit's variant.
+  182 tests, lint, typecheck, and depcruise pass.
+- 2026-10-19 — Engine prototypes on branch `step6-engine-proto` (uncommitted): A = current Web
+  Audio + Canvas; B = Tone.js 15.1.22 + p5 2.3.4; C = Tone.js + a WebGL shader. All behind the
+  same engine interfaces; `?piece=a|b|c` selects one on localhost only. Tone is imported module
+  by module (its main entry starts a blob: worker that the CSP blocks) with a timer clock and no
+  worklet-based synths. Under the real `vercel.json` headers all three run with no CSP errors;
+  p5 logs Permissions-Policy warnings for motion sensors. Goodbye download (gzip): A ≈ 9 KB,
+  B ≈ 480 KB (p5 alone 412 KB), C ≈ 71 KB; budget 40 KB. The CSP, dependency, and lint rules
+  already allow the libraries; the budget and ADR-0008 decision 4 do not. User decision: keep the
+  rules unchanged until the user has listened to A, B, and C.
+- 2026-10-19 — User decisions after the prototypes: keep all three engines; each visit gets a
+  mood (psychedelic, glitchy, ethereal) for image and sound, picked by the key, mostly matched
+  (about 1 in 4 crossed); Tone.js allowed for sound; p5 allowed for the ethereal image only, as
+  a separate download. Recorded as ADR-0008 Amendment 2 and ADR-0009 Amendment 2. Budgets: base
+  Goodbye download ≤100 KB; the p5 download ≤512 KB. Tone modules that use worklets are excluded
+  (BitCrusher, Freeverb, JCReverb, comb filters, PluckSynth).
+- 2026-10-19 — Amendment 2 built (uncommitted, branch `step6-engine-proto`): moods in
+  `backdrop.ts`; mood engines in `goodbye.ts` (Tone.js sound; shader image for psychedelic and
+  glitchy; p5 image for ethereal, by a second dynamic import; Web Audio and Canvas 2D fallbacks).
+  `check:size` budgets the second download on its own and fails a third. Three dependency rules
+  keep p5 in `p5VisualEngine.ts`, loaded only by dynamic import from `goodbye.ts` (a static
+  import was tried and failed the rule). Gate: lint, format, typecheck, depcruise, test, build,
+  `check:size`, and the secret scan pass. Sizes (gzip): startup 4.9 KB (WARN, ceiling 5 KB);
+  Goodbye download 74.1 KB / 100 KB; p5 download 342.6 KB / 512 KB. Browser test under the
+  `vercel.json` headers with `?mood=` on `/work/`: the dialog opens in each mood; psychedelic and
+  glitchy draw on WebGL; ethereal draws on a p5 canvas. No CSP errors. Ethereal logs 2 p5
+  motion-sensor Permissions-Policy errors (p5 asks for the sensors; the policy blocks them).
+  Next: the user listens to all three moods.
+- 2026-10-19 — User listened to the moods: "getting better", but wants a much greater variety
+  of images and sounds. User decisions: banks inside each mood; recorded sound samples; more
+  moods. Recorded as ADR-0008 Amendment 3 (samples and new moods are open decisions) and
+  ADR-0009 Amendment 3. WIP commit `step6-engine-proto` before the work (local, no push).
+- 2026-10-19 — Banks built (uncommitted): 4 leads, 4 beds, 3 percussion voices, 3 airs, 5
+  shader scenes, 3 p5 scenes; the mood is now the treatment only. The new Tone modules
+  (AMSynth, MembraneSynth, MetalSynth, AutoFilter, Noise) were checked for worklet imports
+  first. New core test: every bank entry is reachable from the key. Gate passes; Goodbye
+  download 76.4 KB / 100 KB, p5 download 342.9 KB / 512 KB. Browser test under the
+  `vercel.json` headers: all 13 image entries, each with a different sound mix, loaded the
+  asked-for engines (`data-exp-loaded`), with no errors except the known p5 motion-sensor
+  messages. Screenshots checked for tunnel, rings, orbits, and aurora; aurora was too faint
+  and got brightness folds. Next: the user listens.
+- 2026-10-19 — Follow-up checks on the banks: Skip to end in each mood (with wind and surf
+  air) reaches `/` with a new record and no page error, so the new `close()` disposes cleanly.
+  Lit showcase screenshots of all 13 image entries: the 10 shader entries are clearly
+  different; the 3 p5 entries looked the same (a pale wash), so the p5 glow and layer wash
+  were cut and the scene marks made stronger; after the fix they differ. Six fresh browser
+  visits gave six different hues and bank mixes.
+- 2026-10-19 — User listened to the banks: wants "more atmosphere, more ambience, more
+  texture, audibly and visibly". WIP commit `608d04dc` (local, no push) first. Built (uncommitted,
+  ADR-0008 Amendment 4): sound: air in every visit (`none` replaced by `hush`), a haze pad,
+  and a texture layer by mood; image: haze, dust, grain, vignette (shader in-pass; p5 on a
+  cleared overlay canvas). Fixes found on the way: (1) the p5 image washed out because direct
+  canvas drawing changed `fillStyle` behind p5's fill cache; now wrapped in save/restore (this
+  also caused the pale ethereal images before); (2) glitchy cells showed saturated red-pink;
+  the shader now applies the `isSaturatedRed` test per pixel; (3) aurora ran at 24 fps and
+  showed fine stripes; now one soft filled shape per curtain, about 50 fps. Checks: gate passes
+  (Goodbye download 77.4 KB / 100 KB; p5 343.9 KB / 512 KB); Skip to end in each mood goes
+  home with a new record and no errors; reduced motion redraws at most every 4 s; no sampled
+  pixel failed the red test (the random visits may not have hit a red hue). Frame rates in
+  headless Chrome: shader 47–60 fps, p5 32–50 fps. Not yet measured on an iPhone. Next: the
+  user listens.
+- 2026-10-19 — User asked about Hydra and about adding their own images and recorded sounds
+  later. Measured `hydra-synth` 1.4.0 (AGPL-3.0, `eval` at construction, microphone on by
+  default, 58.7 KB gzip). User decision: an own Hydra-style engine with feedback (ADR-0008
+  Amendment 5, ADR-0009 Amendment 4). WIP commit `a19aff70` (local, no push) first.
+  DECISION NEEDED (user): the user's images and recorded sounds (with the samples item).
+- 2026-10-19 — Hydra-style engine built (uncommitted): 7 ops (`osc`, `shape`, `rotate`,
+  `scale`, `repeat`, `modulate`, `pixelate`), 1–3 per visit from the key, on top of the 5
+  scenes; feedback in two passes (ping-pong framebuffers; atmosphere, dim, and red guard in the
+  screen pass only); `highp` where the GPU has it; the image clock wraps at 2000. New tests: the
+  chain pick (core) and the flash counter (a 10 Hz flicker counts, a slow fade does not). Gate
+  passes; Goodbye download 79.3 KB / 100 KB. Browser, under the `vercel.json` headers: all 7 ops
+  and 2 chains of 3 loaded with no compile error and no page error; flash probe (`?probe=1`) at
+  most 1 flash in any 1 s window (limit 3), with real frame reads (mean luminance about 0.22);
+  1280 × 720 at 52–60 fps with the probe off; reduced motion redraws about every 4 s. Contact
+  sheet checked: each op looks different. Not yet checked on an iPhone (precision, speed).
+- 2026-10-19 — PAUSED (user decision): the sound and image work (moods, banks, atmosphere,
+  Hydra-style engine) is WIP on branch `step6-engine-proto`. The user returns to it later
+  for listening and tuning; open items: new moods, the user's images and recorded sounds
+  (needs the ADR-0009 network change), the message words, and the iPhone check. The user wants
+  to move on with the remaining steps now.
