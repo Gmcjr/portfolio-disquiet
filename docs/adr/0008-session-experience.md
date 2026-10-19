@@ -136,6 +136,9 @@ their input, so the welcome page states the facts before the button.
 - Sequence: dark → first messages → showcase → second messages → "Remember?" → whiteout or
   blackout → fade back in. The showcase replays the record through the same mapping as the live
   layer.
+- The messages vary per visit (user decision, 2026-10-19): a short set of variants, each built
+  from phrases of the raw note; the visit's key picks one. The variants are drafts that the user
+  edits later.
 - The visitor can pause or skip at any time. "Show all text" gives every message and a visit
   record (counts of clicks, pages, key presses, minutes, and the longest stillness).
 - Each message is also spoken (user decision 11). The text shows at the same time as the voice,

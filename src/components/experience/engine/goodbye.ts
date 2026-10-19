@@ -8,7 +8,12 @@ import { safeColor } from '../../../lib/experience/color';
 import { createPRNG } from '../../../lib/experience/key';
 import { limitBright, neutralFrame } from '../../../lib/experience/params';
 import { computeSeal, displaySeal } from '../../../lib/experience/provenance';
-import { allText, buildCues, type Cue } from '../../../lib/experience/script';
+import {
+  allText,
+  buildCues,
+  pickVariant,
+  type Cue,
+} from '../../../lib/experience/script';
 import {
   replayStep,
   showcaseDurationMs,
@@ -86,7 +91,8 @@ export async function playGoodbye(
   const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const visitMs = visit.events[visit.events.length - 1]?.t ?? 0;
   const showcaseMs = showcaseDurationMs(visitMs);
-  const cues = buildCues(backdrop, calm, showcaseMs);
+  const variant = pickVariant(visit.key);
+  const cues = buildCues(backdrop, calm, showcaseMs, variant);
   const seal = await computeSeal(visit.key, visit.events);
 
   // Engines.
@@ -244,7 +250,7 @@ export async function playGoodbye(
       allTextBox.hidden = !open;
       button('text')?.setAttribute('aria-pressed', String(open));
       if (open) {
-        const lines = [...allText(), '', ...summaryLines(visit, seal)];
+        const lines = [...allText(variant), '', ...summaryLines(visit, seal)];
         allTextBox.replaceChildren(
           ...lines.map((text) => {
             const p = document.createElement('p');

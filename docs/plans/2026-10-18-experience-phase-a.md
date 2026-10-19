@@ -269,3 +269,7 @@ Follow the steps in order. A step is done only when its verification passes.
   prototypes go on branch `step6-engine-proto`. The project's Vercel "automation bypass" secret
   dates from 2026-10-17 (not created by this session's checks); the user decides whether to
   revoke it.
+- 2026-10-19 — Message variants built (uncommitted): 6 drafts in `script.ts`, each one opening
+  line and two closing lines, then "Remember?"; the key picks one per visit. A test checks that
+  every phrase is verbatim in the raw note. "Show all text" lists only the visit's variant.
+  182 tests, lint, typecheck, and depcruise pass.

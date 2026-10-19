@@ -41,8 +41,10 @@ import {
   WHITEOUT_HOLD_MS,
   WHITEOUT_SWELL_MS,
   WHITEOUT_TO_BLACK_MS,
+  MESSAGE_VARIANTS,
   allText,
   buildCues,
+  pickVariant,
   holdMs,
 } from './script.js';
 import { summarize } from './summary.js';
@@ -387,6 +389,21 @@ describe('showcase', () => {
 });
 
 describe('goodbye script', () => {
+  const V = MESSAGE_VARIANTS[0] ?? { opening: [], closing: [] };
+
+  it('picks the same variant for the same key, and varies across keys', () => {
+    expect(pickVariant(SEED_A)).toBe(pickVariant(SEED_A));
+    const rand = createPRNG(SEED_B);
+    const seen = new Set<unknown>();
+    for (let run = 0; run < PROPERTY_RUNS; run += 1) {
+      const key = Array.from({ length: 64 }, () =>
+        Math.floor(rand() * 16).toString(16),
+      ).join('');
+      seen.add(pickVariant(key));
+    }
+    expect(seen.size).toBe(MESSAGE_VARIANTS.length);
+  });
+
   it('holds a sentence for at least 2.5 s, then 300 ms a word', () => {
     expect(holdMs('one two three four five')).toBe(2500);
     expect(holdMs('one two three four five six')).toBe(2800);
@@ -398,7 +415,7 @@ describe('goodbye script', () => {
       ending: 'whiteout' as const,
       emergence: 'sudden' as const,
     };
-    const cues = buildCues(whiteout, true, 60_000);
+    const cues = buildCues(whiteout, true, 60_000, V);
     expect(cues.find((c) => c.kind === 'ending')).toMatchObject({
       ending: 'blackout',
       durationMs: BLACKOUT_MS,
@@ -409,7 +426,12 @@ describe('goodbye script', () => {
   });
 
   it('spreads a whiteout and blackout over at least 5 s', () => {
-    const cues = buildCues({ ...BACKDROP, ending: 'whiteout' }, false, 60_000);
+    const cues = buildCues(
+      { ...BACKDROP, ending: 'whiteout' },
+      false,
+      60_000,
+      V,
+    );
     const ending = cues.find((c) => c.kind === 'ending');
     expect(ending?.durationMs).toBe(
       WHITEOUT_SWELL_MS + WHITEOUT_HOLD_MS + WHITEOUT_TO_BLACK_MS,
@@ -418,11 +440,11 @@ describe('goodbye script', () => {
   });
 
   it('keeps the cues in time order and ends with the fade back in', () => {
-    const cues = buildCues(BACKDROP, false, 75_000);
+    const cues = buildCues(BACKDROP, false, 75_000, V);
     const times = cues.map((c) => c.atMs);
     expect(times).toEqual([...times].sort((a, b) => a - b));
     expect(cues[cues.length - 1]?.kind).toBe('fade-in');
-    expect(allText()[allText().length - 1]).toBe('Remember?');
+    expect(allText(V)[allText(V).length - 1]).toBe('Remember?');
   });
 });
 
