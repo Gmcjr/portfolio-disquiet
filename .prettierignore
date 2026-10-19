@@ -1,3 +1,4 @@
 dist/
 .astro/
 bun.lock
+docs/notes/experience-raw-note.md

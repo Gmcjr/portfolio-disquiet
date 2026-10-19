@@ -5,7 +5,8 @@ date: 2026-09-10
 
 # ADR-0003: Layered module topology, lint-enforced
 
-**Status:** Accepted — 2026-09-10
+**Status:** Accepted — 2026-09-10. Amended by ADR-0009 (Accepted, 2026-10-18), which
+adds a fourth layer, the experience core (`src/lib/experience/`).
 **Reversibility:** Cheap — it's structure, not runtime behavior.
 
 ## Context

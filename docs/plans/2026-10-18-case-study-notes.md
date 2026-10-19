@@ -1,12 +1,11 @@
 ---
-status: in-progress
+status: complete
 date: 2026-10-18
 ---
 
 # Case-study notes — Step 5 input
 
-**Status:** In progress — all 6 questions answered 2026-10-18. Next: draft the 3 case studies
-for the user's review.
+**Status:** Complete — 2026-10-18. The 3 case studies are published (recovery plan Step 5).
 
 These are notes, not site copy. Each fact names its source. A case study may only claim what a
 source supports. Where the resume claims more than the repo reports confirm, the note says so.

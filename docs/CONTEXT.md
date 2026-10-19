@@ -73,6 +73,11 @@ typography/spacing/motion, view transitions, conventional page structure. Not no
 navigation, not heavy 3D. One inexpensive signature moment is in scope. A more immersive,
 experimental direction is explicitly a later phase, not a v1 goal.
 
+**Note (2026-10-18):** the user brought an opt-in, visitor-made audiovisual layer into the
+current phase (recovery Step 6). It runs only after the visitor presses Enter, and it keeps a
+record of the visitor's input in the browser tab only, never sent. See ADR-0008. This
+also changes §7: Web Audio is now in scope for that layer.
+
 ## 11. Fixed constraints
 
 Bun (>=1.2) for package management and local dev. TailwindCSS v4. TypeScript, strict. Deploy
@@ -88,9 +93,6 @@ frictionless (one file plus assets, no plumbing) — see ADR-0002.
 
 ## Open items
 
-- **Real name and a one-line role** (e.g. "Developer · Musician · Visual artist") — the only
-  input still needed from the user. Blocks the OG card art, the about-page copy, and the
-  `Person` JSON-LD. Does not block anything else.
 - **Final domain and a dedicated contact-form destination alias.** `disquiet.dev` is a working
   placeholder everywhere in this project — see ADR-0002's note on `src/config/site.ts` being
   the single place it may appear.

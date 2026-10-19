@@ -46,13 +46,17 @@ Three layers, dependencies point one way only, enforced in CI by `dependency-cru
 ┌───────────────────┐      ┌────────────────────────┐
 │  content            │      │  cross‑cutting          │
 │  src/content/**     │      │  src/config/site.ts     │
-│  src/lib/content/   │      │  src/lib/seo.ts         │
-│  (schemas, typed    │      │  src/lib/analytics.ts   │
+│  src/lib/content/   │      │  top-level src/lib/*.ts │
+│  (schemas, typed    │      │  (e.g. contact-schema)  │
 │  query functions)   │      │                          │
 │  imports nothing    │      │  imports nothing from UI │
 │  from UI            │      │                          │
 └───────────────────┘      └────────────────────────┘
 ```
+
+**Fourth layer (ADR-0009):** the experience core (`src/lib/experience/`), pure TypeScript
+with no DOM or network, used only by the experience shell in `src/components/experience/`
+(the shell comes in PR-B of the Phase A plan). dependency-cruiser and ESLint enforce it.
 
 `api/contact.ts` is its own unit, outside this tree. It may import
 `src/lib/contact-schema.ts` and other pure `src/lib/` helpers — never `src/lib/content`, never
@@ -102,8 +106,11 @@ typecheck, depcruise, unit tests, build, secret scan, `check:size`, and Lighthou
 
 - **`check:size`** (`scripts/check-bundle-size.ts`) on the built output: JS per page (gzip)
   ≤12 KB on content routes and ≤16 KB on `/contact`; Latin font files ≤120 KB; no inline
-  scripts (the CSP blocks them). `/experience` is exempt until recovery plan Step 6.
-- **Lighthouse CI** (`lighthouserc.json`) on 6 routes, at the full targets since
+  scripts (the CSP blocks them). On every route, code that loads after a click (the experience
+  engine after Enter) has its own budget of ≤40 KB, and a nested dynamic import fails (Phase A).
+  On pages with the experience layer, the startup script is reported on its own line (target
+  ≤2 KB, fail above 5 KB). The rules are in `scripts/bundle-size/analyze.ts`, with tests.
+- **Lighthouse CI** (`lighthouserc.json`) on 8 routes, at the full targets since
   2026-10-17: performance ≥0.9, accessibility 1.0, SEO 1.0, LCP ≤2000 ms, CLS ≤0.05.
 - **Accessibility:** WCAG 2.2 AA. Lighthouse runs axe-core for the automated part (user
   decision, 2026-10-17: no separate axe CLI). Manual review covers the rest.
@@ -126,3 +133,5 @@ See `docs/adr/`:
 - ADR‑0005 — Bun for install/build, Node for function runtime.
 - ADR‑0006 — GoatCounter for analytics.
 - ADR‑0007 — Static rendering as invariant.
+- ADR‑0008 — Visitor-made audiovisual experience.
+- ADR‑0009 — Experience runtime structure.
