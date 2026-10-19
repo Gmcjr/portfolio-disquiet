@@ -7,6 +7,9 @@ export const GRID = 64;
 
 export type PageNav = 'load' | 'push' | 'replace' | 'traverse';
 
+/** Stored as an index into this list. */
+export const NAVS: readonly PageNav[] = ['load', 'push', 'replace', 'traverse'];
+
 export type VisitEvent =
   | { kind: 'enter'; t: number }
   | { kind: 'page'; t: number; path: string; nav: PageNav }

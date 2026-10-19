@@ -20,9 +20,9 @@ import {
   MAX_GAP_MS,
   append,
   encodeFrom,
-  parseEvents,
   wrapEnvelope,
 } from './timeline.js';
+import { parseEvents } from './timeline-read.js';
 import { PROPERTY_RUNS, SEED_A, randomStream } from './__fixtures__/streams.js';
 import { GOLDEN_V1 } from './__fixtures__/golden-v1.js';
 

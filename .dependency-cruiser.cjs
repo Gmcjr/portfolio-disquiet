@@ -52,8 +52,10 @@ module.exports = {
       name: 'experience-bootstrap-lazy',
       severity: 'error',
       comment:
-        'The startup script loads the engine only by dynamic import, after Enter (ADR-0009 §2).',
-      from: { path: '^src/components/experience/bootstrap\\.ts$' },
+        'The startup code loads the engine only by dynamic import, at the Goodbye click (ADR-0009 Amendment 1).',
+      from: {
+        path: '^src/components/experience/(bootstrap|start|contract|record/[^/]+)\\.ts$',
+      },
       to: {
         path: '^src/components/experience/(engine|detour)/',
         dependencyTypesNot: ['dynamic-import'],
@@ -63,11 +65,29 @@ module.exports = {
       name: 'experience-bootstrap-core-subset',
       severity: 'error',
       comment:
-        'The startup script reaches only events.ts and envelope.ts in the core, to stay small.',
-      from: { path: '^src/components/experience/bootstrap\\.ts$' },
+        'The startup code (recording) reaches only events, envelope, timeline, and key in the core (and timeline-read lazily), to stay small (ADR-0009 Amendment 1).',
+      from: {
+        path: '^src/components/experience/(bootstrap|start|contract|record/[^/]+)\\.ts$',
+        pathNot: '\\.test\\.ts$',
+      },
       to: {
         path: '^src/lib/experience/',
-        pathNot: '^src/lib/experience/(events|envelope)\\.ts$',
+        pathNot:
+          '^src/lib/experience/(events|envelope|timeline|timeline-read|key)\\.ts$',
+      },
+    },
+    {
+      name: 'experience-startup-parse-lazy',
+      severity: 'error',
+      comment:
+        'The startup code loads the record parser only when a visit continues after a reload (ADR-0009 Amendment 1).',
+      from: {
+        path: '^src/components/experience/(bootstrap|start|contract|record/[^/]+)\\.ts$',
+        pathNot: '\\.test\\.ts$',
+      },
+      to: {
+        path: '^src/lib/experience/timeline-read\\.ts$',
+        dependencyTypesNot: ['dynamic-import'],
       },
     },
     {
@@ -108,7 +128,7 @@ module.exports = {
       name: 'experience-recorder-events-only',
       severity: 'error',
       comment: 'The recorder produces events and knows nothing else.',
-      from: { path: '^src/components/experience/engine/recorder\\.ts$' },
+      from: { path: '^src/components/experience/record/recorder\\.ts$' },
       to: {
         path: '^src/lib/experience/',
         pathNot: '^src/lib/experience/events\\.ts$',

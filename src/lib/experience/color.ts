@@ -1,6 +1,6 @@
-// Colour helpers for flash safety (WCAG 2.3.1). With full-colour art on reading
-// plates (ADR-0008, user decision 10), the art has no brightness band; the visual
-// engine still avoids saturated red, which the red-flash rule singles out.
+// Colour helpers for flash safety (WCAG 2.3.1). The Goodbye art is full colour
+// (ADR-0008 Amendment 1), with no brightness band; the visual engine still avoids
+// saturated red, which the red-flash rule singles out.
 
 import { SATURATED_RED_RATIO } from './params.js';
 

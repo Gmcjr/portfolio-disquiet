@@ -10,6 +10,27 @@ fourth layer). PR-A builds the core and the checks; PR-B builds the shell.
 **Reversibility:** Cheap until Phase A ships. After that, two parts are expensive to change:
 the event-to-parameter seam (§3) and the stored record format (§5).
 
+## Amendment 1 (2026-10-18) — accepted, follows ADR-0008 Amendment 1
+
+ADR-0008 Amendment 1 removes the live layer and records every visit from arrival. The user
+approved these runtime changes on 2026-10-18:
+
+- **Startup code records.** The recorder, the storage adapter, and the parts of the core they
+  need (`events`, `envelope`, `timeline`, `key`) load on every page and start at once. No
+  sound, no canvas, no animation frame at startup. The startup script grows past 2 KB; it must
+  stay ≤5 KB, and every page stays ≤12 KB at startup.
+- **The piece loads at Goodbye.** The audio and visual engines, the mapping, the showcase, and
+  the Goodbye sequence load by one dynamic import at the Goodbye click (≤40 KB). The click
+  also creates the AudioContext.
+- **No live tick.** While the visitor browses, the session only drains events into the
+  timeline and flushes them. The fold, sample, and map run only in the showcase replay.
+- **States:** `recording → goodbye → ended → recording` (a new visit), plus `failed`. The
+  `resumable` and `live` states go away. A reload continues the recording at once.
+- **The bar** holds Time to Say Goodbye (and an optional "What is this?" link). Mute and Pause
+  live in the Goodbye dialog.
+- **The dependency rules** change to match: the startup entry may import `recorder.ts` and
+  `storage.ts` and their core modules; the engines and the mapping stay lazy.
+
 ## Context
 
 ADR-0008 sets what the experience does. This ADR sets how the code is built. The forces:

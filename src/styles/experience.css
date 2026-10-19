@@ -1,0 +1,169 @@
+/* The experience layer (ADR-0008 Amendment 1). No CSS animation here: Astro
+   restarts CSS animations on persisted elements (no-css-animation.test.ts checks
+   this). Fades use transitions driven by data attributes, or the Web Animations API. */
+
+:root {
+  --exp-bar-block-size: 64px;
+  --z-exp-controls: 50;
+  --z-exp-cover: 1000;
+  /* Behind each message over the bright showcase (design plan D-7: at least 8.8:1). */
+  --exp-message-plate: color-mix(in srgb, var(--color-black) 72%, transparent);
+}
+
+/* The layer paints inside the page's own snapshot during a page change. */
+#experience-layer {
+  view-transition-name: none !important;
+}
+
+/* The Goodbye bar: small, bottom right, on every page. */
+.exp-bar {
+  position: fixed;
+  right: var(--spacing-4);
+  bottom: var(--spacing-4);
+  z-index: var(--z-exp-controls);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-2) var(--spacing-3);
+  background-color: var(--bg);
+  border: 1px solid var(--muted);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+}
+#experience-layer[data-state='goodbye'] .exp-bar {
+  visibility: hidden;
+}
+.exp-what {
+  color: var(--muted);
+  text-decoration: underline;
+}
+
+.exp-control {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 var(--spacing-3);
+  color: var(--text);
+  background-color: var(--bg);
+  border: 1px solid var(--muted);
+  border-radius: var(--radius-md);
+}
+.exp-control:hover {
+  text-decoration: underline;
+}
+.exp-control[aria-pressed='true'],
+.exp-control[data-emphasis='strong'] {
+  color: var(--bg);
+  background-color: var(--text);
+}
+
+/* Keep focused content and the last line of a page clear of the bar (WCAG 2.4.11). */
+html {
+  scroll-padding-block-end: var(--exp-bar-block-size);
+}
+body {
+  padding-block-end: var(--exp-bar-block-size);
+}
+
+/* The Goodbye stage: a full-screen dialog. The note: "the screen goes dark". */
+.exp-stage {
+  width: 100vw;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--color-paper-0);
+  background-color: var(--color-black);
+  opacity: 0;
+  transition: opacity var(--duration-fade-3) var(--ease-sine);
+}
+.exp-stage[data-visible='true'] {
+  opacity: 1;
+}
+.exp-stage::backdrop {
+  background-color: var(--color-black);
+}
+.exp-stage .exp-canvas-host {
+  position: absolute;
+  inset: 0;
+}
+.exp-canvas-host canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.exp-messages {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--spacing-6);
+  pointer-events: none;
+}
+.exp-messages p {
+  grid-area: 1 / 1;
+  max-width: 32ch;
+  padding: var(--spacing-3) var(--spacing-4);
+  font-size: var(--text-step-2);
+  text-align: center;
+  background-color: var(--exp-message-plate);
+  border-radius: var(--radius-md);
+  opacity: 0;
+  transition: opacity var(--duration-fade-2) var(--ease-sine);
+}
+.exp-messages p[data-current='true'] {
+  opacity: 1;
+}
+@media (min-width: 48rem) {
+  .exp-messages p {
+    font-size: var(--text-step-3);
+  }
+}
+.exp-all-text {
+  position: absolute;
+  inset: var(--spacing-6) var(--spacing-4) 6rem;
+  overflow: auto;
+  padding: var(--spacing-4);
+  background-color: var(--color-black);
+  border: 1px solid var(--color-ink-300);
+}
+.exp-stage-controls {
+  position: absolute;
+  right: var(--spacing-4);
+  bottom: var(--spacing-4);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+}
+.exp-stage .exp-control {
+  color: var(--color-paper-0);
+  background-color: var(--color-black);
+  border-color: var(--color-ink-300);
+}
+.exp-stage .exp-control[aria-pressed='true'] {
+  color: var(--color-black);
+  background-color: var(--color-paper-0);
+}
+.exp-stage :focus-visible {
+  outline-color: var(--color-accent);
+}
+
+/* The cover that hides the page change at the end, then fades out. */
+.exp-cover {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-exp-cover);
+  background-color: var(--color-black);
+  opacity: 1;
+  transition: opacity var(--duration-fade-3) var(--ease-sine);
+}
+.exp-cover[data-fading='true'] {
+  opacity: 0;
+}
+
+@media (forced-colors: active) {
+  .exp-canvas-host {
+    display: none;
+  }
+}

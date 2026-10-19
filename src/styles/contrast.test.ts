@@ -1,6 +1,5 @@
 // Checks text contrast from the design tokens, in both themes (WCAG 2.2 1.4.3).
-// The experience art is full colour on reading plates (ADR-0008, user decision
-// 10), so text always sits on --bg; this test guards those pairs.
+// Text sits on --bg on every page; this test guards those pairs and the focus ring.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
@@ -68,5 +67,9 @@ describe.each(Object.entries(themes))('%s theme', (_theme, scope) => {
 
   it.each(['--text', '--muted'])('%s on --bg is at least 4.5:1', (token) => {
     expect(ratio(resolve(token, scope), bg)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it('--focus-ring on --bg is at least 3:1 (WCAG 1.4.11)', () => {
+    expect(ratio(resolve('--focus-ring', scope), bg)).toBeGreaterThanOrEqual(3);
   });
 });

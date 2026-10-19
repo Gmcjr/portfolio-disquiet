@@ -8,6 +8,7 @@
   --color-ink-600: #595959; /* muted text on paper (6.7:1) */
   --color-ink-300: #a6a6a6; /* muted text on ink-950 (7.8:1) */
   --color-accent: #c6d733; /* acid chartreuse — decoration only, never text */
+  --color-black: #000000; /* the Goodbye stage: "the screen goes dark" */
 
   /* Spacing (based on 0.25rem = 4px grid) */
   --spacing-1: 0.25rem; /* 4px */
@@ -28,9 +29,20 @@
   --duration-base: 180ms;
   --duration-slow: 260ms;
   --duration-slower: 400ms;
+  /* Long fades for the Goodbye sequence (design plan D-1). */
+  --duration-fade-1: 800ms;
+  --duration-fade-2: 1200ms;
+  --duration-fade-3: 2000ms;
+  --duration-fade-4: 3000ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-sine: cubic-bezier(0.37, 0, 0.63, 1);
 
   /* Fonts (see docs/STYLEGUIDE.md, Typography) */
   --font-heading: 'Kumar One Outline', system-ui, sans-serif;
   --font-sans: 'Lekton', ui-monospace, monospace;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+  /* Type steps on the 1.25 scale, for the Goodbye messages. */
+  --text-step-2: 1.5625rem;
+  --text-step-3: 1.953rem;
 }

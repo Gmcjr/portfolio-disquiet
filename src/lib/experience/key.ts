@@ -1,6 +1,6 @@
 // The visit key (ADR-0008 §2): an artistic device, not a security feature. Each
-// start value is hashed alone, the hashes are shuffled by a generator seeded from
-// the random bytes, and the shuffled list is hashed into one key. Only the key is
+// start value is hashed alone, the hashes are put in an order that the random
+// bytes decide, and the ordered list is hashed into one key. Only the key is
 // stored; the start values are dropped after this.
 
 const MASK_64 = (1n << 64n) - 1n;
@@ -88,6 +88,13 @@ export async function deriveKey(values: StartValues): Promise<string> {
     `referrer:${values.referrer}`,
   ];
   const hashes = await Promise.all(fields.map((field) => sha256Hex(field)));
-  const seed = await sha256Hex(values.entropyHex);
-  return sha256Hex(shuffle(hashes, createPRNG(seed)).join('|'));
+  // The random order: each hash is ranked by a hash of itself and the random
+  // bytes. Same values, same order; new random bytes, a new order.
+  const ranks = await Promise.all(
+    hashes.map((hash) => sha256Hex(`${values.entropyHex}|${hash}`)),
+  );
+  const order = hashes
+    .map((hash, i) => ({ hash, rank: ranks[i] ?? '' }))
+    .sort((a, b) => (a.rank < b.rank ? -1 : a.rank > b.rank ? 1 : 0));
+  return sha256Hex(order.map((item) => item.hash).join('|'));
 }

@@ -2,6 +2,7 @@
 import { ClientRouter } from 'astro:transitions';
 import '../styles/global.css';
 import Header from '../components/Header.astro';
+import ExperienceLayer from '../components/experience/ExperienceLayer.astro';
 // Preload the body font so text does not reflow when it arrives (CLS).
 import lektonRegularUrl from '@fontsource/lekton/files/lekton-latin-400-normal.woff2?url';
 
@@ -63,8 +64,12 @@ const ogImageUrl = new URL('/og-image.png', Astro.site).href;
   </head>
 
   <body class="m-0 bg-bg text-text font-sans">
+    <a class="skip-link" href="#main">
+      Skip to content
+    </a>
+    <ExperienceLayer />
     <Header />
-    <main class="snap-y snap-mandatory min-h-screen">
+    <main id="main" tabindex="-1" class="snap-y snap-mandatory min-h-screen">
       <slot />
     </main>
     <ClientRouter />

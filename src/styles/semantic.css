@@ -9,12 +9,15 @@
     --bg: var(--color-paper-0);
     --text: var(--color-ink-900);
     --muted: var(--color-ink-600);
+    /* The accent fails on paper (1.5:1), so light focus uses ink. */
+    --focus-ring: var(--color-ink-900);
   }
 
   [data-theme='dark'] {
     --bg: var(--color-ink-950);
     --text: var(--color-paper-0);
     --muted: var(--color-ink-300);
+    --focus-ring: var(--color-accent);
   }
 }
 

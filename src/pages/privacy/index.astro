@@ -4,10 +4,58 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
 <BaseLayout
   title="Privacy"
-  description="How this site handles analytics and contact form data."
+  description="How this site handles your visit, analytics, and contact form data."
 >
   <div class="font-sans text-text">
     <h1>Privacy</h1>
+    <!-- Draft from the security planner, adapted for ADR-0008 Amendment 1.
+         Open decision: the user edits the wording. -->
+    <section id="experience">
+      <h2>Your visit becomes a piece of sound and image</h2>
+      <p>
+        From the first page, this browser tab keeps a record of your visit. When
+        you press Time to Say Goodbye, the record plays back once as sound and
+        image. Then it is deleted.
+      </p>
+      <p>The record holds:</p>
+      <ul>
+        <li>your clicks and taps, as a cell on a coarse grid of the screen;</li>
+        <li>
+          your pointer position on the same grid, at most ten times a second;
+        </li>
+        <li>how far you scroll;</li>
+        <li>
+          the time of each key press, rounded to a tenth of a second. It never
+          holds the key.
+        </li>
+        <li>the pages that you open, as the path only;</li>
+        <li>when you hide the tab or change the theme.</li>
+      </ul>
+      <p>
+        It holds nothing that you type or point at in a form field, such as the
+        contact form.
+      </p>
+      <p>
+        On your first page, the site also makes a random key from random
+        numbers, the time, your timezone, your theme, your screen size, and the
+        type of page you came from (none, this site, or another site). The site
+        keeps the key only, not these values.
+      </p>
+      <p>
+        The record stays in the session storage of this tab. The site sends it
+        to no server and to no third party. I never receive it, and it cannot
+        identify you to me.
+      </p>
+      <p>
+        The site deletes the record after Time to Say Goodbye. Your browser
+        deletes it when you close the tab. If a browser restores the tab later,
+        the site deletes a record that is more than 30 minutes old.
+      </p>
+      <p>
+        You can read the record in the developer tools of your browser, under
+        Session Storage, at the key <code>experience:visit</code>.
+      </p>
+    </section>
     <section>
       <h2>Analytics</h2>
       <p>

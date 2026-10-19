@@ -7,6 +7,39 @@
 @import 'tailwindcss';
 @import './tokens.css';
 @import './semantic.css';
+@import './experience.css';
+
+@layer base {
+  /* One visible focus ring for the whole site (WCAG 2.4.7). */
+  :focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  /* Page UI follows the reduced-motion setting. Experience art has its own rules. */
+  @media (prefers-reduced-motion: reduce) {
+    *:not(#experience-layer, #experience-layer *) {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Skip link: hidden until it has keyboard focus (WCAG 2.4.1). */
+.skip-link {
+  position: absolute;
+  left: var(--spacing-4);
+  top: -100px;
+  z-index: 100;
+  padding: var(--spacing-2) var(--spacing-4);
+  background-color: var(--bg);
+  color: var(--text);
+}
+.skip-link:focus {
+  top: var(--spacing-4);
+}
 
 /* Theme toggle icons */
 .icon-sun,

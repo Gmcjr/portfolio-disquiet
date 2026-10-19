@@ -1,0 +1,25 @@
+---
+// One experience control (design plan D-5). The variant set is closed: no class
+// or style props. The label is the accessible name and never changes; a toggle
+// shows its state with aria-pressed.
+interface Props {
+  action: 'goodbye' | 'pause' | 'mute' | 'text' | 'skip';
+  label: string;
+  pressable: boolean;
+  emphasis: 'default' | 'strong';
+}
+
+const { action, label, pressable, emphasis } = Astro.props;
+const flag = { [`data-exp-${action}`]: '' };
+---
+
+<button
+  type="button"
+  class="exp-control"
+  data-exp-action={action}
+  data-emphasis={emphasis}
+  aria-pressed={pressable ? 'false' : undefined}
+  {...flag}
+>
+  {label}
+</button>

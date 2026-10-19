@@ -5,11 +5,42 @@ date: 2026-10-18
 
 # ADR-0008: Visitor-made audiovisual experience
 
-**Status:** Accepted — 2026-10-18 (draft 4, from the Step 6 planning run). Replaces drafts 2 and 3. The runtime structure is in ADR-0009. The build steps are in
+**Status:** Accepted — 2026-10-18 (draft 4, from the Step 6 planning run), with Amendment 1 (same day). Replaces drafts 2 and 3. The runtime structure is in ADR-0009. The build steps are in
 `docs/plans/2026-10-18-experience-phase-a.md`.
 **Reversibility:** Cheap. The experience is an opt-in layer. Remove the layer component, its
 startup script, `src/lib/experience/`, and `src/pages/experience/`. The rest of the site does
 not depend on them.
+
+## Amendment 1 (2026-10-18, user decisions after the first live test)
+
+This amendment overrides the sections below where they disagree.
+
+1. **No live layer.** Nothing plays or draws while the visitor uses the site. The piece is its
+   own event: it starts only when the visitor presses Time to Say Goodbye.
+2. **Recording from arrival.** Every visit is recorded from the first page, with no Enter step.
+   All input and inaction map to sound and image parameters. The record stays in the browser
+   and goes nowhere. This replaces the governing rule ("nothing runs before Enter") and the
+   Enter-based consent.
+3. **Gone after playback.** Goodbye plays an audiovisual piece of the whole visit once. After
+   the playback, the record is deleted for good.
+4. **A small Goodbye bar on every page,** for every visitor, from the first page.
+5. **Effects on earlier decisions:**
+   - Decision 1 (live layer after Enter) and decision 6 (Continue after a reload) no longer
+     apply. A reload in the same tab continues the recording without a click, because nothing
+     plays until Goodbye.
+   - Decision 5: the 40 KB budget now covers the code that loads at the Goodbye click.
+   - Decision 10 (full-colour live art on reading plates): the art now plays only inside the
+     Goodbye sequence, where no page text sits under it.
+   - Mute and Pause move into the Goodbye sequence. The bar holds Time to Say Goodbye only.
+   - The `/experience` welcome page loses its Enter role.
+6. **User decisions (same day):** remove the reading plates; remove the `/experience` page (the
+   privacy page explains the piece); after Goodbye, fade back in on the home page, and a new
+   visit starts recording.
+7. **DECISION NEEDED (user):**
+   - The privacy text and a short line in the bar (for example "What is this?" linking to the
+     privacy page). Planner default: add the link.
+   - The footer line "This site stores no personal data" becomes false. Planner default:
+     change it with the privacy text.
 
 ## Source spec
 

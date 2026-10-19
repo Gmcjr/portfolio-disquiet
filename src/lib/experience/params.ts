@@ -26,6 +26,39 @@ export const MESSAGE_MS_PER_WORD = 300;
 
 export const MAX_VOICES = 4;
 
+/** The master gain the engine may set: never above MASTER_GAIN_MAX. */
+export function safeMasterGain(level: number): number {
+  return Number.isFinite(level)
+    ? Math.min(MASTER_GAIN_MAX, Math.max(0, level))
+    : 0;
+}
+
+/** A frequency the engine may play: never below MIN_FREQ_HZ. */
+export function safeFrequency(hz: number): number {
+  return Number.isFinite(hz) ? Math.max(MIN_FREQ_HZ, hz) : MIN_FREQ_HZ;
+}
+
+export function midiToHz(midi: number): number {
+  return 440 * 2 ** ((midi - 69) / 12);
+}
+
+/** What the audio engine needs from the backdrop, so it never imports backdrop.ts. */
+export interface AudioSetup {
+  rootMidi: number;
+  /** Semitone steps of the scale above the root. */
+  scale: readonly number[];
+  waveform: 'sine' | 'triangle' | 'sawtooth';
+  reverbSeconds: number;
+}
+
+/** What the visual engine needs from the backdrop. */
+export interface VisualSetup {
+  paletteHue: number;
+  texture: 'grain' | 'flow' | 'strata';
+}
+
+export type Motion = 'full' | 'reduced' | 'paused';
+
 /** Every field is a normalized engine control; no field is named after an input. */
 export interface AudioParams {
   /** 0–1; the engine scales it by MASTER_GAIN_MAX. */

@@ -188,7 +188,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['src/components/experience/engine/recorder.ts'],
+    files: ['src/components/experience/record/recorder.ts'],
     rules: {
       'no-restricted-properties': [
         'error',
@@ -208,9 +208,9 @@ export default tseslint.config(
           patterns: [
             ...ASTRO_IMPORT_BANS,
             {
-              regex: '(^|/)bootstrap(\\.ts)?$',
+              regex: '(^|/)(bootstrap|start)(\\.ts)?$',
               message:
-                'Only the ExperienceLayer.astro script imports bootstrap.ts.',
+                'Only the ExperienceLayer.astro script imports the startup script (start.ts).',
             },
           ],
         },

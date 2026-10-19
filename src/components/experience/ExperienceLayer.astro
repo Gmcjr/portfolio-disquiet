@@ -1,0 +1,70 @@
+---
+// The experience layer (ADR-0008 Amendment 1). It is the same on every page and
+// persists across page changes. While the visitor browses it shows only the
+// Goodbye bar; the piece plays in the dialog after the Goodbye click.
+import ExperienceControl from './ExperienceControl.astro';
+---
+
+<div
+  id="experience-layer"
+  data-state="recording"
+  transition:persist="experience-layer"
+>
+  <aside class="exp-bar" aria-label="Your visit">
+    <ExperienceControl
+      action="goodbye"
+      label="Time to Say Goodbye"
+      pressable={false}
+      emphasis="default"
+    />
+    <a class="exp-what" href="/privacy/#experience">
+      What is this?
+    </a>
+  </aside>
+
+  <dialog class="exp-stage" aria-labelledby="exp-stage-title">
+    <h2 id="exp-stage-title" class="sr-only" tabindex="-1">
+      Time to Say Goodbye
+    </h2>
+    <div class="exp-canvas-host" data-exp-canvas-host aria-hidden="true"></div>
+    <div
+      class="exp-messages"
+      role="log"
+      aria-label="Messages"
+      data-exp-log
+    ></div>
+    <div class="exp-all-text" data-exp-all-text hidden></div>
+    <div class="exp-stage-controls">
+      <ExperienceControl
+        action="pause"
+        label="Pause"
+        pressable={true}
+        emphasis="default"
+      />
+      <ExperienceControl
+        action="mute"
+        label="Mute"
+        pressable={true}
+        emphasis="default"
+      />
+      <ExperienceControl
+        action="text"
+        label="Show all text"
+        pressable={true}
+        emphasis="default"
+      />
+      <ExperienceControl
+        action="skip"
+        label="Skip to end"
+        pressable={false}
+        emphasis="default"
+      />
+    </div>
+  </dialog>
+  <div class="exp-cover" data-exp-cover aria-hidden="true" hidden></div>
+  <p class="sr-only" role="status" data-exp-status></p>
+</div>
+
+<script>
+  import './start';
+</script>

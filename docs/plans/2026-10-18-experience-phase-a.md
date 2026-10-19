@@ -6,8 +6,8 @@ date: 2026-10-18
 # Experience, Phase A — detail plan for recovery Step 6
 
 **Status:** In progress — the detail plan for Step 6 of `docs/plans/2026-10-16-recovery.md`.
-Planning done 2026-10-18. Step A0 done: ADR-0008 and ADR-0009 accepted. Step A1 (PR-A) built
-locally on branch `step6-pr-a`; next: commit, PR, and CI.
+Planning done 2026-10-18. Step A0 done: ADR-0008 and ADR-0009 accepted. Step A1 done (PR #2
+merged). Step A2 (PR-B, the layer) in progress on branch `step6-pr-b`.
 
 Sources: the user's raw note (`docs/notes/experience-raw-note.md`), ADR-0008 (what), ADR-0009
 (how). This plan came from a Blueprint planning run on 2026-10-18 (architecture, frontend,
@@ -196,3 +196,76 @@ Follow the steps in order. A step is done only when its verification passes.
   pages return 200; `/experience/` returns 404, as planned until PR-B. Not checked in a browser:
   the console for CSP errors. The new CSP directives restrict only workers and framing, which
   the site does not use. Waiting for the user to review and merge PR #2.
+- 2026-10-18 — Step A1 done. PR #2 merged into `main` (`9a460afc`, merge commit) after CI passed
+  on the last commit. Production deploy `pivirjg1t` smoke test: the 6 real pages 200;
+  `/experience/` and `/writing/` 404; `robots.txt` and the sitemap 200; the new CSP,
+  `Referrer-Policy`, and `Permissions-Policy` headers present; the contact function returns 422
+  for an invalid post. Step A2 (PR-B) started on branch `step6-pr-b`.
+- 2026-10-18 — Step A2 (PR-B) slices 1–4 built on `step6-pr-b`, not committed.
+  - Slice 1: skip link, `main#main`, global `:focus-visible` with a `--focus-ring` token (dark
+    accent, light ink), a reduced-motion rule for page UI, and a `.plate` class on each page's
+    content column and on the footer. Lighthouse unchanged: accessibility and SEO 1.0 on all
+    pages; the same CLS values as before (home 0.0565, the known local failure).
+  - Slices 2–3: `engine/ports`, `storage` (incremental writes, memory fallback), `recorder`
+    (narrow event types, form fields and the layer excluded), `session` (one tick, page changes,
+    flush on hide), `audioEngine` (factory over a fake-able context; a test proves the master gain
+    stays ≤0.15 and no frequency goes below 40 Hz), `visualEngine` (full colour, brightness ramps
+    ≥800 ms). 23 shell tests in jsdom. A deliberate key read made the recorder test fail.
+  - Slice 4: `ExperienceLayer.astro` (persisted, no view-transition name), `ExperienceControl`,
+    `start.ts` (the one import; a window symbol guards a second copy), `bootstrap.ts`,
+    `contract.ts` (shared types; avoids an import cycle), `engine/index.ts`, `controls.ts`,
+    `experience.css`, and the `/experience` page (panels by CSS, the security planner's draft
+    consent text, `noindex`). New layer state `resumable`: a stored live visit waits for
+    Continue; in that state Goodbye loads the engine to end the visit and delete the record.
+    `check:size`: startup script 2.0 KB (target 2 KB); after-Enter code 10.8 KB of 40 KB.
+  - Browser check (static build, Playwright): before Enter no engine file and no record; first
+    Tab focuses the skip link; Enter → live; the record holds the expected events; the canvas
+    survives a page change; `view-transition-name` is `none`; no console errors; no off-site
+    requests. Goodbye is a placeholder (ends the visit, deletes the record) until slice 6.
+  - Not added to Lighthouse CI: `/experience/` (it has `noindex` until PR-C; add it then).
+- 2026-10-18 — Checkpoint (slice 5) with the user. The user: the live layer "feels ok" but must
+  not run during the visit. User decisions: no live sound or image; every visit is recorded
+  from arrival (no Enter step); all input maps to parameters that play back only after Time to
+  Say Goodbye; after playback the record is gone; a small Goodbye bar on every page. Recorded as
+  ADR-0008 Amendment 1 (accepted, user decisions) and ADR-0009 Amendment 1 (proposed runtime
+  changes). Open decisions with defaults are listed in ADR-0008 Amendment 1. The slices 1–4 code
+  needs rework before slice 6.
+- 2026-10-19 — Rework for ADR-0008/0009 Amendment 1, plus slice 6 (Goodbye), on `step6-pr-b`,
+  not committed. User decisions (2026-10-18): remove the reading plates; remove `/experience`;
+  after Goodbye, fade back in on the home page and start a new visit; approve the ADR-0009
+  amendment.
+  - Plates and the `/experience` page removed. The live session, controls, and tick removed.
+  - `record/` (startup code): `recorder`, `storage` (raw events; parses nothing), `recording`
+    (records from arrival; on a continued visit it loads `timeline-read.ts` lazily and queues new
+    events; ignores Astro's first-load page event), `ports`. `bootstrap.ts` + `start.ts`: start
+    the recording; at the Goodbye click create the AudioContext, stop the recording, load the
+    engine, then delete the record and start a new visit.
+  - `engine/goodbye.ts`: the full sequence in a modal `<dialog>`: dark, the note's messages one
+    at a time (spoken with an on-device voice when one exists), the showcase replay through the
+    mapping with sound and full-colour image, "Remember?", whiteout or blackout, then a black
+    cover, `navigate('/')`, and a fade in. Pause, Mute, Show all text (messages, visit summary,
+    visit seal), Skip to end; Escape skips; a page change during Goodbye ends it.
+  - Key derivation now orders the hashes by a hash rank (no generator at startup); the parser
+    split out of `timeline.ts`; a new lazy-parser dependency rule.
+  - Privacy page: new section `#experience` (the security planner's draft, adapted; the user
+    edits the wording). Footer line replaced ("Nothing about you leaves your browser unless you
+    send the contact form."). Both were open decisions; these are the planner defaults.
+  - Verification: lint, format, typecheck, depcruise, all tests (21 shell tests), build, secret
+    scan pass. `check:size`: startup script 4.9 KB (WARN: over the 2 KB target, under the 5 KB
+    ceiling); content pages 11.5 KB of 12 KB at startup; Goodbye code 9.3 KB of 40 KB. Browser
+    run (static build): on arrival no canvas and no engine; the record grows while browsing;
+    Goodbye opens the dark stage with the first message and a canvas; Show all text lists the
+    messages, the summary, and the seal; Skip ends on `/` with a new recording; only same-origin
+    requests; the only warning is `speech-unavailable` (no on-device voice in the test browser).
+  - Not built yet: a jsdom test of the Goodbye end order (`goodbye.ts` has no ports; the browser
+    run covers it); the user's listening test.
+- 2026-10-19 — Lighthouse with the Goodbye bar on every page: performance, accessibility, and
+  SEO 1.0 on all 8 pages; CLS unchanged (home 0.0565, the known local failure that `main` also
+  shows; the other pages 0.019–0.033).
+- 2026-10-19 — User test of the Goodbye piece: "getting better". User decisions: prototype
+  other sound and image engines (2–3 variants with libraries, compared in the browser); draft
+  short message variants from phrases in the note (the key picks one per visit; the user edits
+  the words later). Work so far saved as one local WIP commit on `step6-pr-b` (not pushed);
+  prototypes go on branch `step6-engine-proto`. The project's Vercel "automation bypass" secret
+  dates from 2026-10-17 (not created by this session's checks); the user decides whether to
+  revoke it.
