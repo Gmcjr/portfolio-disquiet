@@ -65,6 +65,10 @@ const SETUP = {
   scale: [0, 3, 5, 7, 10],
   waveform: 'sine' as const,
   mood: 'ethereal' as const,
+  lead: 'bells' as const,
+  bed: 'fm' as const,
+  percussion: 'noise' as const,
+  air: 'none' as const,
   reverbSeconds: 0.1,
 };
 

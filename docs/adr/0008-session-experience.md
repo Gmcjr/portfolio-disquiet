@@ -58,6 +58,27 @@ This amendment overrides the sections below where they disagree.
    master gain limit, and the 40 Hz floor. Tone.js runs with a timer clock and no worklet-based
    modules, so the CSP does not change.
 
+## Amendment 3 (2026-10-19, user decisions after listening to the moods)
+
+The user asked for a much greater variety of images and sounds.
+
+1. **Banks inside each mood.** The key picks one entry from each bank for each visit:
+   - sound: a lead voice (bells, strings, glass, marimba), a bed for held chords (FM, duo, AM,
+     fat saw), a percussion voice (noise, metal, membrane), and an air layer (none, wind, surf);
+   - image: a shader scene for psychedelic and glitchy (waves, tunnel, cells, marble, rings),
+     and a p5 scene for ethereal (strokes, orbits, aurora).
+2. **The mood is the treatment.** The mood sets the effects, the envelope lengths, and the
+   timing. The banks set the sources. Any source can play in any mood. The mapping rows apply
+   to every entry.
+3. **Safety stays.** Every scene moves slowly enough that no area flashes 3 times a second.
+   No new sound module uses an AudioWorklet, so the CSP does not change.
+4. **DECISION NEEDED (user):**
+   - which new moods to add next to psychedelic, glitchy, and ethereal;
+   - the source of the recorded sound samples (the user records them, or the planner proposes
+     public-domain sets for approval). Samples need an ADR-0009 change first: the piece would
+     download audio files at the Goodbye click, and ADR-0009 §6 now says "no network code".
+     They also need an audio budget in `check:size` and a licence for each file.
+
 ## Source spec
 
 The user's raw note, `docs/notes/experience-raw-note.md`, is the spec. Read it in full before

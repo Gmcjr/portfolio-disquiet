@@ -6,7 +6,19 @@ import { navigate } from 'astro:transitions/client';
 import { deriveBackdrop, SCALES } from '../../../lib/experience/backdrop';
 import { safeColor } from '../../../lib/experience/color';
 import { createPRNG } from '../../../lib/experience/key';
-import { limitBright, neutralFrame } from '../../../lib/experience/params';
+import {
+  AIRS,
+  BEDS,
+  LEADS,
+  limitBright,
+  MOODS,
+  neutralFrame,
+  P5_SCENES,
+  PERCUSSION,
+  SHADER_SCENES,
+  type AudioSetup,
+  type VisualSetup,
+} from '../../../lib/experience/params';
 import { computeSeal, displaySeal } from '../../../lib/experience/provenance';
 import {
   allText,
@@ -97,31 +109,39 @@ export async function playGoodbye(
   const cues = buildCues(backdrop, calm, showcaseMs, variant);
   const seal = await computeSeal(visit.key, visit.events);
 
-  // Engines, by mood (ADR-0008 Amendment 2). On localhost only, ?mood= overrides
-  // the key, for testing. The ethereal image loads p5 as a separate download.
+  // Engines, by mood and bank (ADR-0008 Amendments 2 and 3). On localhost only,
+  // ?mood=, ?scene=, ?lead=, ?bed=, ?percussion=, and ?air= override the key, for
+  // testing. The ethereal image loads p5 as a separate download.
   const local = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-  const asked = local
-    ? new URLSearchParams(window.location.search).get('mood')
-    : null;
-  const override =
-    asked === 'psychedelic' || asked === 'glitchy' || asked === 'ethereal'
-      ? asked
-      : null;
-  const visualMood = override ?? backdrop.visualMood;
-  const audioMood = override ?? backdrop.audioMood;
+  const query = new URLSearchParams(local ? window.location.search : '');
+  const asked = <T extends string>(
+    name: string,
+    list: readonly T[],
+  ): T | null => list.find((item) => item === query.get(name)) ?? null;
+  const mood = asked('mood', MOODS);
+  const visualMood = mood ?? backdrop.visualMood;
+  const audioMood = mood ?? backdrop.audioMood;
   const host = layer.querySelector<HTMLElement>('[data-exp-canvas-host]');
-  const visualSetup = {
+  const visualSetup: VisualSetup = {
     paletteHue: backdrop.paletteHue,
     texture: backdrop.texture,
     mood: visualMood,
+    shaderScene: asked('scene', SHADER_SCENES) ?? backdrop.shaderScene,
+    p5Scene: asked('scene', P5_SCENES) ?? backdrop.p5Scene,
   };
-  const audioSetup = {
+  const audioSetup: AudioSetup = {
     rootMidi: backdrop.rootMidi,
     scale: SCALES[backdrop.scale],
     waveform: backdrop.waveform,
     reverbSeconds: backdrop.reverbSeconds,
     mood: audioMood,
+    lead: asked('lead', LEADS) ?? backdrop.lead,
+    bed: asked('bed', BEDS) ?? backdrop.bed,
+    percussion: asked('percussion', PERCUSSION) ?? backdrop.percussion,
+    air: asked('air', AIRS) ?? backdrop.air,
   };
+  // On localhost only: which engines really loaded, for the browser checks.
+  const loaded: string[] = [];
   const canvasEngine = (canvas: HTMLCanvasElement): VisualEngine | null => {
     const ctx2d = canvas.getContext('2d', { alpha: false });
     return ctx2d === null
@@ -145,17 +165,18 @@ export async function playGoodbye(
         rand: createPRNG(visit.key.slice(16)),
         safeColor,
       });
+      loaded.push(`p5:${visualSetup.p5Scene}`);
     } catch {
       warn('engine-load-failed');
     }
   }
+  if (visual === null && visualMood !== 'ethereal') {
+    visual = createShaderVisualEngine(mountCanvas(host), visualSetup);
+    if (visual !== null) loaded.push(`shader:${visualSetup.shaderScene}`);
+  }
   if (visual === null) {
-    const canvas = mountCanvas(host);
-    visual =
-      visualMood === 'ethereal'
-        ? canvasEngine(canvas)
-        : (createShaderVisualEngine(canvas, visualSetup) ??
-          canvasEngine(mountCanvas(host)));
+    visual = canvasEngine(mountCanvas(host));
+    if (visual !== null) loaded.push('canvas');
   }
   if (visual === null) warn('canvas-unavailable');
   let audio: AudioEngine | null = null;
@@ -168,14 +189,18 @@ export async function playGoodbye(
         audioSetup,
         createPRNG(visit.key.slice(48)),
       );
+      const { lead, bed, percussion, air } = audioSetup;
+      loaded.push(`tone:${audioMood}:${lead}:${bed}:${percussion}:${air}`);
     } catch {
       audio = createAudioEngine(
         audioContext,
         audioSetup,
         createPRNG(visit.key.slice(48)),
       );
+      loaded.push('webaudio');
     }
   }
+  if (local) layer.dataset.expLoaded = loaded.join(' ');
   const voice = localVoice();
   if (voice === null) warn('speech-unavailable');
 

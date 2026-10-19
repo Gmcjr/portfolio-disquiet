@@ -3,6 +3,24 @@
 // backdrop value comes from its own generator stream, so values do not correlate.
 
 import { createPRNG } from './key.js';
+import {
+  AIRS,
+  BEDS,
+  LEADS,
+  MOODS,
+  P5_SCENES,
+  PERCUSSION,
+  SHADER_SCENES,
+  type Air,
+  type Bed,
+  type Lead,
+  type Mood,
+  type P5Scene,
+  type Percussion,
+  type ShaderScene,
+} from './params.js';
+
+export { MOODS, type Mood };
 
 export type Texture = 'grain' | 'flow' | 'strata';
 export type Waveform = 'sine' | 'triangle' | 'sawtooth';
@@ -10,9 +28,6 @@ export type ScaleName =
   'minor-pentatonic' | 'major-pentatonic' | 'dorian' | 'aeolian';
 export type Emergence = 'gradual' | 'sudden';
 export type Ending = 'whiteout' | 'blackout';
-export type Mood = 'psychedelic' | 'glitchy' | 'ethereal';
-
-export const MOODS: readonly Mood[] = ['psychedelic', 'glitchy', 'ethereal'];
 /** About 1 visit in 4 gets a sound mood that differs from its image mood. */
 export const CROSSED_MOOD_SHARE = 0.25;
 
@@ -43,6 +58,13 @@ export interface Backdrop {
   visualMood: Mood;
   /** backdrop-mood: the style of the sound; mostly the same as the image. */
   audioMood: Mood;
+  /** backdrop-sources: the sound and image banks (ADR-0008 Amendment 3). */
+  lead: Lead;
+  bed: Bed;
+  percussion: Percussion;
+  air: Air;
+  shaderScene: ShaderScene;
+  p5Scene: P5Scene;
   /** Row long-stillness: one breath cycle, 6–10 s (user decision). */
   breathMs: number;
   /** Row page-dwell: time between new voices, 15–30 s (user decision). */
@@ -67,6 +89,8 @@ export function deriveBackdrop(key: string): Backdrop {
   const others = MOODS.filter((mood) => mood !== visualMood);
   const audioMood =
     m() < CROSSED_MOOD_SHARE ? pick(others, m, visualMood) : visualMood;
+  // Its own stream, so the earlier backdrop values do not change.
+  const banks = createPRNG(key.slice(24, 40));
   const scales = Object.keys(SCALES) as ScaleName[];
   return {
     paletteHue: Math.floor(a() * 360),
@@ -82,6 +106,12 @@ export function deriveBackdrop(key: string): Backdrop {
     seasonMs: between(d, 60000, 240000),
     visualMood,
     audioMood,
+    lead: pick(LEADS, banks, 'bells'),
+    bed: pick(BEDS, banks, 'fm'),
+    percussion: pick(PERCUSSION, banks, 'noise'),
+    air: pick(AIRS, banks, 'none'),
+    shaderScene: pick(SHADER_SCENES, banks, 'waves'),
+    p5Scene: pick(P5_SCENES, banks, 'strokes'),
   };
 }
 

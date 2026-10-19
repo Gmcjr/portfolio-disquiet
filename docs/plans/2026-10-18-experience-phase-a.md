@@ -300,3 +300,22 @@ Follow the steps in order. A step is done only when its verification passes.
   glitchy draw on WebGL; ethereal draws on a p5 canvas. No CSP errors. Ethereal logs 2 p5
   motion-sensor Permissions-Policy errors (p5 asks for the sensors; the policy blocks them).
   Next: the user listens to all three moods.
+- 2026-10-19 — User listened to the moods: "getting better", but wants a much greater variety
+  of images and sounds. User decisions: banks inside each mood; recorded sound samples; more
+  moods. Recorded as ADR-0008 Amendment 3 (samples and new moods are open decisions) and
+  ADR-0009 Amendment 3. WIP commit `step6-engine-proto` before the work (local, no push).
+- 2026-10-19 — Banks built (uncommitted): 4 leads, 4 beds, 3 percussion voices, 3 airs, 5
+  shader scenes, 3 p5 scenes; the mood is now the treatment only. The new Tone modules
+  (AMSynth, MembraneSynth, MetalSynth, AutoFilter, Noise) were checked for worklet imports
+  first. New core test: every bank entry is reachable from the key. Gate passes; Goodbye
+  download 76.4 KB / 100 KB, p5 download 342.9 KB / 512 KB. Browser test under the
+  `vercel.json` headers: all 13 image entries, each with a different sound mix, loaded the
+  asked-for engines (`data-exp-loaded`), with no errors except the known p5 motion-sensor
+  messages. Screenshots checked for tunnel, rings, orbits, and aurora; aurora was too faint
+  and got brightness folds. Next: the user listens.
+- 2026-10-19 — Follow-up checks on the banks: Skip to end in each mood (with wind and surf
+  air) reaches `/` with a new record and no page error, so the new `close()` disposes cleanly.
+  Lit showcase screenshots of all 13 image entries: the 10 shader entries are clearly
+  different; the 3 p5 entries looked the same (a pale wash), so the p5 glow and layer wash
+  were cut and the scene marks made stronger; after the fix they differ. Six fresh browser
+  visits gave six different hues and bank mixes.

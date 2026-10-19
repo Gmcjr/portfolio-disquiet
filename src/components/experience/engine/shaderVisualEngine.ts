@@ -1,12 +1,19 @@
-// The WebGL shader image for the Goodbye piece (ADR-0008 Amendment 2), behind the
-// same VisualEngine interface, with no library. One full-screen fragment shader:
-// a warped, flowing colour field with light, grain, ripples, a ghost, and the
-// mark of a time away. The mood folds it into a kaleidoscope (psychedelic) or
-// breaks it into sliding blocks and split channels (glitchy). The ethereal mood
-// uses p5, and this shader only as its fallback.
+// The WebGL shader image for the Goodbye piece (ADR-0008 Amendments 2 and 3),
+// behind the same VisualEngine interface, with no library. One full-screen
+// fragment shader. The scene (the key picks one) is the colour field: waves (a
+// warped flow), tunnel, cells, marble, or rings. Light, grain, ripples, a ghost,
+// and the mark of a time away go on top. The mood is the treatment: it folds the
+// field into a kaleidoscope (psychedelic) or breaks it into sliding blocks and
+// split channels (glitchy). The ethereal mood uses p5, and this shader only as
+// its fallback.
+//
+// Flash safety (WCAG 2.3.1): every scene moves with u_time, which advances at most
+// about 2.3 units a second, so no pixel's brightness cycles near 3 times a second.
+// The fields keep low spatial frequencies and a light range of 0.18–0.85.
 
 import {
   BRIGHTNESS_RAMP_MIN_MS,
+  type ShaderScene,
   type VisualParams,
   type VisualSetup,
 } from '../../../lib/experience/params';
@@ -14,6 +21,13 @@ import type { VisualEngine } from './visualEngine';
 
 const MAX_RIPPLES = 6;
 const MODE = { psychedelic: 0, glitchy: 1, ethereal: 2 } as const;
+const SCENE: Readonly<Record<ShaderScene, number>> = {
+  waves: 0,
+  tunnel: 1,
+  cells: 2,
+  marble: 3,
+  rings: 4,
+};
 const RIPPLE_MS = 1400;
 const SMOOTH_MS = 400;
 
@@ -26,7 +40,7 @@ const FRAGMENT = `
 precision mediump float;
 uniform vec2 u_res;
 uniform float u_time, u_hue, u_sat, u_dim, u_flow, u_turb, u_grain, u_ghost, u_absence;
-uniform float u_layers, u_offset, u_mode;
+uniform float u_layers, u_offset, u_mode, u_scene;
 uniform vec2 u_light;
 uniform vec3 u_ripples[${MAX_RIPPLES}];
 
@@ -45,12 +59,60 @@ vec3 hsl(float h, float s, float l) {
   vec3 rgb = clamp(abs(mod(h / 60.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);
   return l + s * (rgb - 0.5) * (1.0 - abs(2.0 * l - 1.0));
 }
-float field(vec2 p, float t) {
+float waves(vec2 p, float t) {
   // Domain warp: order keeps the field calm, turbulence folds it.
   vec2 q = vec2(fbm(p + t), fbm(p + vec2(5.2, 1.3) - t));
   vec2 r = vec2(fbm(p + (4.0 * (0.4 + u_turb)) * q + vec2(1.7, 9.2) + t * 0.5),
                 fbm(p + 4.0 * q + vec2(8.3, 2.8)));
   return mix(fbm(p + 4.0 * r), fbm(p + vec2(0.0, t * 2.0)), u_flow * 0.6);
+}
+float tunnel(vec2 p, float t) {
+  // Fly forward through a noise tube. The centre fades out, so its fine detail
+  // never shimmers.
+  vec2 c = p - vec2(1.25 * u_res.x / u_res.y, 1.25);
+  float r = length(c);
+  float depth = 0.6 / (r + 0.25) + t * 2.0;
+  vec2 dir = c / max(r, 0.001);
+  float v = fbm(dir * (1.2 + u_turb) + vec2(depth, -depth * 0.5));
+  return mix(0.5, v, smoothstep(0.05, 0.5, r));
+}
+float cells(vec2 p, float t) {
+  // Slow stained glass: each cell is one flat colour with soft edges.
+  vec2 g = p * (1.2 + u_turb * 0.8);
+  vec2 i = floor(g);
+  float best = 9.0; float id = 0.0;
+  for (int y = -1; y <= 1; y++) {
+    for (int x = -1; x <= 1; x++) {
+      vec2 o = vec2(float(x), float(y));
+      vec2 h = vec2(hash(i + o), hash(i + o + 7.3));
+      vec2 pt = o + 0.5 + 0.4 * sin(t * 3.0 + 6.2831 * h);
+      float d = length(g - i - pt);
+      if (d < best) { best = d; id = hash(i + o + 3.1); }
+    }
+  }
+  return mix(id, fbm(p + t), 0.25 + u_flow * 0.3) - smoothstep(0.35, 0.0, best) * 0.08;
+}
+float marble(vec2 p, float t) {
+  // Wide veins of colour, bent by noise.
+  float n = fbm(p * 0.8 + vec2(t, -t * 0.7));
+  return 0.5 + 0.5 * sin(p.x * (1.0 + u_flow) + p.y * 0.6 + n * (4.0 + u_turb * 6.0));
+}
+float rings(vec2 p, float t) {
+  // Ripples from three drifting centres; where they meet, they interfere.
+  float v = 0.0;
+  for (int k = 0; k < 3; k++) {
+    float fk = float(k);
+    vec2 centre = vec2(1.2 + sin(t * (1.0 + fk) + fk * 2.1), 1.2 + cos(t * (1.3 + fk * 0.4) + fk));
+    v += sin(length(p - centre) * (5.0 + u_turb * 4.0) - t * 20.0);
+  }
+  return 0.5 + v / 6.0 + (fbm(p + t) - 0.5) * 0.3;
+}
+float field(vec2 p, float t) {
+  if (u_scene < 0.5) return waves(p, t);
+  if (u_scene < 1.5) return tunnel(p, t);
+  if (u_scene < 2.5) return cells(p, t);
+  if (u_scene < 3.5) return marble(p, t);
+  return rings(p, t);
 }
 void main() {
   vec2 uv = gl_FragCoord.xy / u_res;
@@ -181,6 +243,7 @@ export function createShaderVisualEngine(
       gl.uniform1f(u('u_layers'), v.layerCount);
       gl.uniform1f(u('u_offset'), v.layerOffset);
       gl.uniform1f(u('u_mode'), MODE[setup.mood]);
+      gl.uniform1f(u('u_scene'), SCENE[setup.shaderScene]);
       gl.uniform2f(u('u_light'), v.lightX, 1 - v.lightY);
       const packed = new Float32Array(MAX_RIPPLES * 3);
       ripples.forEach((r, i) => {

@@ -40,6 +40,15 @@ approved these runtime changes on 2026-10-18:
   Goodbye download stays ≤100 KB. A dependency rule keeps p5 out of the base download.
 - On localhost only, `?mood=psychedelic|glitchy|ethereal` overrides the key, for testing.
 
+## Amendment 3 (2026-10-19) — follows ADR-0008 Amendment 3
+
+- The bank lists (`LEADS`, `BEDS`, `PERCUSSION`, `AIRS`, `SHADER_SCENES`, `P5_SCENES`) and
+  `MOODS` are defined once, in core `params.ts`. `backdrop.ts` picks the entries from its own
+  stream of the key, so the earlier backdrop values do not change.
+- On localhost only, `?scene=`, `?lead=`, `?bed=`, `?percussion=`, and `?air=` override the
+  key. The layer then shows the engines that really loaded in `data-exp-loaded`, so a browser
+  check can see a silent fallback.
+
 ## Context
 
 ADR-0008 sets what the experience does. This ADR sets how the code is built. The forces:

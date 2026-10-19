@@ -19,6 +19,12 @@ import {
   map,
 } from './mapping.js';
 import {
+  AIRS,
+  BEDS,
+  LEADS,
+  P5_SCENES,
+  PERCUSSION,
+  SHADER_SCENES,
   DETUNE_MAX_CENTS,
   MAX_BRIGHT_TRIGGERS_PER_S,
   PARALLAX_MAX_PX,
@@ -144,6 +150,33 @@ describe('backdrop', () => {
     expect([...visual].sort()).toEqual(['ethereal', 'glitchy', 'psychedelic']);
     expect(crossed / runs).toBeGreaterThan(0.18);
     expect(crossed / runs).toBeLessThan(0.32);
+  });
+
+  it('picks every entry of every sound and image bank', () => {
+    const rand = createPRNG(SEED_A);
+    const seen = {
+      lead: new Set<string>(),
+      bed: new Set<string>(),
+      percussion: new Set<string>(),
+      air: new Set<string>(),
+      shaderScene: new Set<string>(),
+      p5Scene: new Set<string>(),
+    };
+    for (let run = 0; run < 500; run += 1) {
+      const key = Array.from({ length: 64 }, () =>
+        Math.floor(rand() * 16).toString(16),
+      ).join('');
+      const b = deriveBackdrop(key);
+      for (const bank of Object.keys(seen) as (keyof typeof seen)[]) {
+        seen[bank].add(b[bank]);
+      }
+    }
+    expect([...seen.lead].sort()).toEqual([...LEADS].sort());
+    expect([...seen.bed].sort()).toEqual([...BEDS].sort());
+    expect([...seen.percussion].sort()).toEqual([...PERCUSSION].sort());
+    expect([...seen.air].sort()).toEqual([...AIRS].sort());
+    expect([...seen.shaderScene].sort()).toEqual([...SHADER_SCENES].sort());
+    expect([...seen.p5Scene].sort()).toEqual([...P5_SCENES].sort());
   });
 
   it('is the same for the same key and differs between keys', () => {

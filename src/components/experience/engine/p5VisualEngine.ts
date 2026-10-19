@@ -1,7 +1,10 @@
-// PROTOTYPE (branch step6-engine-proto): a p5.js visual engine behind the same
-// VisualEngine interface. Painterly strokes that follow a noise flow field; the
-// visit's input steers their speed, order, colour, and density. Instance mode, so
-// nothing leaks into the page, and dispose() removes the sketch.
+// The p5.js image for the ethereal mood (ADR-0008 Amendments 2 and 3), behind the
+// same VisualEngine interface. The scene (the key picks one):
+//   strokes: painterly strokes that follow a noise flow field;
+//   orbits: particles that circle the light, in rings that order keeps round;
+//   aurora: soft curtains of light that sway across the sky.
+// The visit's input steers their speed, order, colour, and density. Instance
+// mode, so nothing leaks into the page, and dispose() removes the sketch.
 
 import p5 from 'p5';
 import {
@@ -111,39 +114,90 @@ export function createP5VisualEngine(deps: P5EngineDeps): VisualEngine {
       const light = safeColor(hue + 40, v.saturation, 0.6);
       gradient.addColorStop(
         0,
-        `rgba(${light.r},${light.g},${light.b},${0.18 * (1 - v.dim)})`,
+        `rgba(${light.r},${light.g},${light.b},${0.04 * (1 - v.dim)})`,
       );
       gradient.addColorStop(1, `rgba(${light.r},${light.g},${light.b},0)`);
       glow.fillStyle = gradient;
       glow.fillRect(0, 0, w, h);
 
-      // Strokes along the flow field. Order straightens them; turbulence bends them.
+      function drawStrokes(count: number, step: number): void {
+        for (let i = 0; i < count; i += 1) {
+          const s = strokes[i];
+          if (s === undefined) continue;
+          const field =
+            p.noise(s.x * 2.5, s.y * 2.5, time * 0.3) *
+            Math.PI *
+            4 *
+            (1 - v.flow * 0.7);
+          const angle =
+            field + (p.noise(i, time) - 0.5) * Math.PI * 2 * v.turbulence;
+          const nx = s.x + Math.cos(angle) * step;
+          const ny = s.y + Math.sin(angle) * step;
+          rgb(hue + s.hue, v.saturation, 0.7, 0.6 * (1 - v.dim));
+          p.line(s.x * w, s.y * h, nx * w, ny * h);
+          s.x = (nx + 1) % 1;
+          s.y = (ny + 1) % 1;
+        }
+      }
+
       time += still ? 0 : (dt / 1000) * (0.1 + v.particleSpeed);
       const count = Math.round(STROKES * Math.max(0.25, Math.min(1, share)));
       const step = still ? 0 : 0.0015 + v.particleSpeed * 0.006;
       p.strokeWeight(1 + v.grain * 2);
-      for (let i = 0; i < count; i += 1) {
-        const s = strokes[i];
-        if (s === undefined) continue;
-        const field =
-          p.noise(s.x * 2.5, s.y * 2.5, time * 0.3) *
-          Math.PI *
-          4 *
-          (1 - v.flow * 0.7);
-        const angle =
-          field + (p.noise(i, time) - 0.5) * Math.PI * 2 * v.turbulence;
-        const nx = s.x + Math.cos(angle) * step;
-        const ny = s.y + Math.sin(angle) * step;
-        rgb(hue + s.hue, v.saturation, 0.55, 0.35 * (1 - v.dim));
-        p.line(s.x * w, s.y * h, nx * w, ny * h);
-        s.x = (nx + 1) % 1;
-        s.y = (ny + 1) % 1;
+      if (setup.p5Scene === 'orbits') {
+        // Each particle keeps its ring around the light. Turbulence makes the
+        // rings wobble; order keeps them round.
+        const reach = Math.min(w, h) * 0.45;
+        for (let i = 0; i < count; i += 1) {
+          const s = strokes[i];
+          if (s === undefined) continue;
+          const ring = 0.08 + s.y * 0.92;
+          const wobble =
+            (p.noise(i * 0.1, time * 0.5) - 0.5) * (1 - v.flow) * 0.4;
+          const radius = reach * ring * (1 + wobble * (0.3 + v.turbulence));
+          const from = s.x * Math.PI * 2;
+          s.x = (s.x + (step * 2) / ring + 1) % 1;
+          const to = s.x * Math.PI * 2;
+          rgb(hue + s.hue, v.saturation, 0.75, 0.7 * (1 - v.dim));
+          p.line(
+            lx + Math.cos(from) * radius,
+            ly + Math.sin(from) * radius,
+            lx + Math.cos(to) * radius,
+            ly + Math.sin(to) * radius,
+          );
+        }
+      } else if (setup.p5Scene === 'aurora') {
+        // Curtains: thin vertical lines of low alpha whose tops sway with noise.
+        const curtains = 2 + Math.round(v.flow * 3);
+        const gap = Math.max(3, Math.round(8 - share * 4));
+        for (let k = 0; k < curtains; k += 1) {
+          for (let x = 0; x < w; x += gap) {
+            const top =
+              h * (0.15 + k * 0.08) +
+              p.noise(x * 0.002, k * 3, time * 0.15) * h * 0.35 +
+              Math.sin(x * 0.004 + time * 0.3 * (k + 1)) *
+                h *
+                0.05 *
+                (0.3 + v.turbulence);
+            // Folds: the curtain is bright in some places and faint in others.
+            const fold = p.noise(x * 0.003, k * 7, time * 0.1);
+            rgb(
+              hue + k * 25 - 20,
+              v.saturation,
+              0.65,
+              0.45 * fold * fold * (1 - v.dim),
+            );
+            p.line(x, top, x, top + h * (0.12 + v.trailLength * 0.25));
+          }
+        }
+      } else {
+        // Strokes along the flow field. Order straightens them; turbulence bends them.
+        drawStrokes(count, step);
       }
-
       // Layers from time on a page, shifted by scroll.
       p.noStroke();
       for (let i = 0; i < v.layerCount; i += 1) {
-        rgb(hue + 30 * (i + 1), v.saturation * 0.6, 0.45, 0.05);
+        rgb(hue + 30 * (i + 1), v.saturation * 0.6, 0.45, 0.015);
         p.rect(
           0,
           ((i + 1) / (v.layerCount + 1)) * h + v.layerOffset * (i + 1) - 20,

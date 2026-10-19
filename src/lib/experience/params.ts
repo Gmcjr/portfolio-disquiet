@@ -42,6 +42,36 @@ export function midiToHz(midi: number): number {
   return 440 * 2 ** ((midi - 69) / 12);
 }
 
+// The mood sets the treatment (effects, timing, palette). The banks set the
+// sources (instruments and scenes). The key picks one of each per visit
+// (ADR-0008 Amendment 3).
+export const MOODS = ['psychedelic', 'glitchy', 'ethereal'] as const;
+export type Mood = (typeof MOODS)[number];
+/** The melodic voice: clicks, keys, and the random notes. */
+export const LEADS = ['bells', 'strings', 'glass', 'marimba'] as const;
+export type Lead = (typeof LEADS)[number];
+/** The held chords. */
+export const BEDS = ['fm', 'duo', 'am', 'fat'] as const;
+export type Bed = (typeof BEDS)[number];
+/** The short hits: key presses. */
+export const PERCUSSION = ['noise', 'metal', 'membrane'] as const;
+export type Percussion = (typeof PERCUSSION)[number];
+/** A noise layer under everything. */
+export const AIRS = ['none', 'wind', 'surf'] as const;
+export type Air = (typeof AIRS)[number];
+/** The shader image (psychedelic and glitchy moods). */
+export const SHADER_SCENES = [
+  'waves',
+  'tunnel',
+  'cells',
+  'marble',
+  'rings',
+] as const;
+export type ShaderScene = (typeof SHADER_SCENES)[number];
+/** The p5 image (ethereal mood). */
+export const P5_SCENES = ['strokes', 'orbits', 'aurora'] as const;
+export type P5Scene = (typeof P5_SCENES)[number];
+
 /** What the audio engine needs from the backdrop, so it never imports backdrop.ts. */
 export interface AudioSetup {
   rootMidi: number;
@@ -49,14 +79,20 @@ export interface AudioSetup {
   scale: readonly number[];
   waveform: 'sine' | 'triangle' | 'sawtooth';
   reverbSeconds: number;
-  mood: 'psychedelic' | 'glitchy' | 'ethereal';
+  mood: Mood;
+  lead: Lead;
+  bed: Bed;
+  percussion: Percussion;
+  air: Air;
 }
 
 /** What the visual engine needs from the backdrop. */
 export interface VisualSetup {
   paletteHue: number;
   texture: 'grain' | 'flow' | 'strata';
-  mood: 'psychedelic' | 'glitchy' | 'ethereal';
+  mood: Mood;
+  shaderScene: ShaderScene;
+  p5Scene: P5Scene;
 }
 
 export type Motion = 'full' | 'reduced' | 'paused';
