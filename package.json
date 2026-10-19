@@ -21,7 +21,7 @@
     "check:size": "bun scripts/check-bundle-size.ts"
   },
   "dependencies": {
-    "@astrojs/mdx": "8.0.1",
+    "@astrojs/mdx": "8.1.0",
     "@astrojs/sitemap": "3.7.4",
     "@fontsource-variable/jetbrains-mono": "5.3.0",
     "@fontsource/kumar-one-outline": "5.3.0",
