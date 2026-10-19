@@ -5,11 +5,113 @@ date: 2026-10-18
 
 # ADR-0008: Visitor-made audiovisual experience
 
-**Status:** Accepted — 2026-10-18 (draft 4, from the Step 6 planning run). Replaces drafts 2 and 3. The runtime structure is in ADR-0009. The build steps are in
+**Status:** Accepted — 2026-10-18 (draft 4, from the Step 6 planning run), with Amendment 1 (same day). Replaces drafts 2 and 3. The runtime structure is in ADR-0009. The build steps are in
 `docs/plans/2026-10-18-experience-phase-a.md`.
 **Reversibility:** Cheap. The experience is an opt-in layer. Remove the layer component, its
 startup script, `src/lib/experience/`, and `src/pages/experience/`. The rest of the site does
 not depend on them.
+
+## Amendment 1 (2026-10-18, user decisions after the first live test)
+
+This amendment overrides the sections below where they disagree.
+
+1. **No live layer.** Nothing plays or draws while the visitor uses the site. The piece is its
+   own event: it starts only when the visitor presses Time to Say Goodbye.
+2. **Recording from arrival.** Every visit is recorded from the first page, with no Enter step.
+   All input and inaction map to sound and image parameters. The record stays in the browser
+   and goes nowhere. This replaces the governing rule ("nothing runs before Enter") and the
+   Enter-based consent.
+3. **Gone after playback.** Goodbye plays an audiovisual piece of the whole visit once. After
+   the playback, the record is deleted for good.
+4. **A small Goodbye bar on every page,** for every visitor, from the first page.
+5. **Effects on earlier decisions:**
+   - Decision 1 (live layer after Enter) and decision 6 (Continue after a reload) no longer
+     apply. A reload in the same tab continues the recording without a click, because nothing
+     plays until Goodbye.
+   - Decision 5: the 40 KB budget now covers the code that loads at the Goodbye click.
+   - Decision 10 (full-colour live art on reading plates): the art now plays only inside the
+     Goodbye sequence, where no page text sits under it.
+   - Mute and Pause move into the Goodbye sequence. The bar holds Time to Say Goodbye only.
+   - The `/experience` welcome page loses its Enter role.
+6. **User decisions (same day):** remove the reading plates; remove the `/experience` page (the
+   privacy page explains the piece); after Goodbye, fade back in on the home page, and a new
+   visit starts recording.
+7. **DECISION NEEDED (user):**
+   - The privacy text and a short line in the bar (for example "What is this?" linking to the
+     privacy page). Planner default: add the link.
+   - The footer line "This site stores no personal data" becomes false. Planner default:
+     change it with the privacy text.
+
+## Amendment 2 (2026-10-19, user decisions after the engine prototypes)
+
+1. **Moods.** Each visit gets a mood for the image and a mood for the sound: psychedelic,
+   glitchy, or ethereal. The key picks them. They are mostly matched: about 1 visit in 4 gets a
+   different sound mood than its image mood. The mapping rows apply in every mood; the mood sets
+   the style only.
+2. **Libraries.** Tone.js is allowed for the sound (this replaces decision 4 for audio). p5.js is
+   allowed for the ethereal image only. Psychedelic and glitchy images use a WebGL shader. The
+   Web Audio and Canvas 2D engines stay as fallbacks.
+3. **Budgets** (this replaces decision 5 for the Goodbye code): the code that loads at the
+   Goodbye click stays ≤100 KB gzip. p5 loads in a second, separate download, only for visits
+   with the ethereal image, ≤512 KB gzip.
+4. **Safety stays:** at most 3 bright flashes per second in every mood (glitchy included), the
+   master gain limit, and the 40 Hz floor. Tone.js runs with a timer clock and no worklet-based
+   modules, so the CSP does not change.
+
+## Amendment 3 (2026-10-19, user decisions after listening to the moods)
+
+The user asked for a much greater variety of images and sounds.
+
+1. **Banks inside each mood.** The key picks one entry from each bank for each visit:
+   - sound: a lead voice (bells, strings, glass, marimba), a bed for held chords (FM, duo, AM,
+     fat saw), a percussion voice (noise, metal, membrane), and an air layer (wind, surf, hush;
+     `none` was removed by Amendment 4);
+   - image: a shader scene for psychedelic and glitchy (waves, tunnel, cells, marble, rings),
+     and a p5 scene for ethereal (strokes, orbits, aurora).
+2. **The mood is the treatment.** The mood sets the effects, the envelope lengths, and the
+   timing. The banks set the sources. Any source can play in any mood. The mapping rows apply
+   to every entry.
+3. **Safety stays.** Every scene moves slowly enough that no area flashes 3 times a second.
+   No new sound module uses an AudioWorklet, so the CSP does not change.
+4. **DECISION NEEDED (user):**
+   - which new moods to add next to psychedelic, glitchy, and ethereal;
+   - the source of the recorded sound samples (the user records them, or the planner proposes
+     public-domain sets for approval). Samples need an ADR-0009 change first: the piece would
+     download audio files at the Goodbye click, and ADR-0009 §6 now says "no network code".
+     They also need an audio budget in `check:size` and a licence for each file.
+
+## Amendment 4 (2026-10-19, user decision after listening to the banks)
+
+The user asked for more atmosphere, ambience, and texture, in sound and in image.
+
+1. **Sound:** three layers that never stop: the air (every visit has one), a haze pad (root
+   and fifth, held through the piece, breathing through a slow filter), and a texture set by
+   the mood (bright hiss, tape hiss with wobble, or hiss with crackle).
+2. **Image:** drifting haze in two depths, slow dust motes, film grain that never goes to zero,
+   and a fixed vignette.
+3. **Still visitor-made.** Stillness and long dwells make the haze, the air, and the pad rise.
+   Scroll shifts the near haze layer. Typing adds grain. Note density drives the crackle.
+4. **Safety:** the dust fades over seconds, the vignette never moves, and every layer moves
+   only with the image clock, so reduced motion still holds the image. The shader now applies
+   the core no-saturated-red test (`isSaturatedRed`) to every pixel.
+
+## Amendment 5 (2026-10-19, user decision: a Hydra-style image engine)
+
+The user asked about Hydra (hydra.ojack.xyz) and chose an own engine in the Hydra style.
+
+1. **The engine.** The shader image gets Hydra-like op chains (`osc`, `shape`, `rotate`,
+   `scale`, `repeat`, `modulate`, `pixelate`) on top of the existing scenes, and feedback:
+   each frame feeds into the next. The key picks the chain. The mood sets the feedback style
+   (psychedelic: zoom-and-rotate echoes; glitchy: stepped displacement). Ethereal stays on p5.
+2. **Still visitor-made.** Stillness makes the feedback stronger, turbulence sets the
+   modulation, scroll shifts the feedback, and speed sets the op speed.
+3. **Safety.** The feedback is a weighted mix with decay below 1, so brightness cannot build
+   up. Ops that flicker from frame to frame (inversion, difference, luma key) and a hue rotation
+   that adds up in the loop are excluded. A localhost probe measures flashes per region.
+4. **Later:** the user's own images and recorded sounds, manipulated by the engines. The engine
+   gets one texture input now (the previous frame); images can feed it later.
+   **DECISION NEEDED (user):** the images and sounds, with the samples item in Amendment 3.
+   They need the same ADR-0009 network change, a media budget, and a licence for each file.
 
 ## Source spec
 
@@ -105,6 +207,9 @@ their input, so the welcome page states the facts before the button.
 - Sequence: dark → first messages → showcase → second messages → "Remember?" → whiteout or
   blackout → fade back in. The showcase replays the record through the same mapping as the live
   layer.
+- The messages vary per visit (user decision, 2026-10-19): a short set of variants, each built
+  from phrases of the raw note; the visit's key picks one. The variants are drafts that the user
+  edits later.
 - The visitor can pause or skip at any time. "Show all text" gives every message and a visit
   record (counts of clicks, pages, key presses, minutes, and the longest stillness).
 - Each message is also spoken (user decision 11). The text shows at the same time as the voice,
@@ -165,6 +270,10 @@ their input, so the welcome page states the facts before the button.
 5. The user tests the first Enter on an iPhone, listens to the whole piece, and approves it.
 
 ## Alternatives rejected
+
+- **The `hydra-synth` library** (2026-10-19, measured at 1.4.0): AGPL-3.0; it calls
+  `globalThis.eval` when it is constructed (`src/lib/sandbox.js`), which the CSP blocks; it
+  asks for the microphone by default; 58.7 KB gzip. The user chose an own Hydra-style engine.
 
 - **Draft 2, seed-driven.** It ignored the visitor's input.
 - **IP address and cookie as the seed.** It conflicts with CONTEXT §5.

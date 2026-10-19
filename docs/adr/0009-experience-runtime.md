@@ -10,7 +10,55 @@ fourth layer). PR-A builds the core and the checks; PR-B builds the shell.
 **Reversibility:** Cheap until Phase A ships. After that, two parts are expensive to change:
 the event-to-parameter seam (§3) and the stored record format (§5).
 
-## Context
+## Amendment 1 (2026-10-18) — accepted, follows ADR-0008 Amendment 1
+
+ADR-0008 Amendment 1 removes the live layer and records every visit from arrival. The user
+approved these runtime changes on 2026-10-18:
+
+- **Startup code records.** The recorder, the storage adapter, and the parts of the core they
+  need (`events`, `envelope`, `timeline`, `key`) load on every page and start at once. No
+  sound, no canvas, no animation frame at startup. The startup script grows past 2 KB; it must
+  stay ≤5 KB, and every page stays ≤12 KB at startup.
+- **The piece loads at Goodbye.** The audio and visual engines, the mapping, the showcase, and
+  the Goodbye sequence load by one dynamic import at the Goodbye click (≤40 KB). The click
+  also creates the AudioContext.
+- **No live tick.** While the visitor browses, the session only drains events into the
+  timeline and flushes them. The fold, sample, and map run only in the showcase replay.
+- **States:** `recording → goodbye → ended → recording` (a new visit), plus `failed`. The
+  `resumable` and `live` states go away. A reload continues the recording at once.
+- **The bar** holds Time to Say Goodbye (and an optional "What is this?" link). Mute and Pause
+  live in the Goodbye dialog.
+- **The dependency rules** change to match: the startup entry may import `recorder.ts` and
+  `storage.ts` and their core modules; the engines and the mapping stay lazy.
+
+## Amendment 2 (2026-10-19) — follows ADR-0008 Amendment 2
+
+- The Goodbye engine picks the audio and visual engines by mood. Tone.js is imported module by
+  module, never from `tone` (its main entry starts a `blob:` worker at import time).
+- The p5 engine loads by a second dynamic import from `engine/goodbye.ts`, only for the ethereal
+  image. `check:size` allows this one nested download with its own budget (≤512 KB); the base
+  Goodbye download stays ≤100 KB. A dependency rule keeps p5 out of the base download.
+- On localhost only, `?mood=psychedelic|glitchy|ethereal` overrides the key, for testing.
+
+## Amendment 3 (2026-10-19) — follows ADR-0008 Amendment 3
+
+- The bank lists (`LEADS`, `BEDS`, `PERCUSSION`, `AIRS`, `SHADER_SCENES`, `P5_SCENES`) and
+  `MOODS` are defined once, in core `params.ts`. `backdrop.ts` picks the entries from its own
+  stream of the key, so the earlier backdrop values do not change.
+- On localhost only, `?scene=`, `?lead=`, `?bed=`, `?percussion=`, and `?air=` override the
+  key. The layer then shows the engines that really loaded in `data-exp-loaded`, so a browser
+  check can see a silent fallback.
+
+## Amendment 4 (2026-10-19) — follows ADR-0008 Amendment 5
+
+- Core `params.ts` defines the op vocabulary (`HYDRA_OPS`) and the chain length limit;
+  `backdrop.ts` picks the chain from its own slice of the key.
+- The shader engine builds its GLSL from the chain at the Goodbye click, from the fixed
+  vocabulary only. This is shader compilation, not JS `eval`, so the CSP does not change.
+- The shader engine draws in two passes: pass A draws the chain with feedback into ping-pong
+  framebuffers; pass B draws the result with the atmosphere, `dim`, and the red guard.
+- On localhost only: `?ops=` overrides the chain; `data-exp-loaded` shows the chain or the
+  shader compile error; `data-exp-flash` shows the measured flash count.
 
 ADR-0008 sets what the experience does. This ADR sets how the code is built. The forces:
 
