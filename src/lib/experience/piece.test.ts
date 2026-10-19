@@ -21,7 +21,9 @@ import {
 import {
   AIRS,
   BEDS,
+  HYDRA_OPS,
   LEADS,
+  MAX_CHAIN,
   P5_SCENES,
   PERCUSSION,
   SHADER_SCENES,
@@ -177,6 +179,25 @@ describe('backdrop', () => {
     expect([...seen.air].sort()).toEqual([...AIRS].sort());
     expect([...seen.shaderScene].sort()).toEqual([...SHADER_SCENES].sort());
     expect([...seen.p5Scene].sort()).toEqual([...P5_SCENES].sort());
+  });
+
+  it('picks Hydra-style chains of distinct ops, within the length limit', () => {
+    const rand = createPRNG(SEED_B);
+    const seen = new Set<string>();
+    const lengths = new Set<number>();
+    for (let run = 0; run < 500; run += 1) {
+      const key = Array.from({ length: 64 }, () =>
+        Math.floor(rand() * 16).toString(16),
+      ).join('');
+      const { chain } = deriveBackdrop(key);
+      expect(new Set(chain).size).toBe(chain.length);
+      lengths.add(chain.length);
+      for (const op of chain) seen.add(op);
+    }
+    expect([...seen].sort()).toEqual([...HYDRA_OPS].sort());
+    expect([...lengths].sort()).toEqual(
+      Array.from({ length: MAX_CHAIN }, (_, i) => i + 1),
+    );
   });
 
   it('is the same for the same key and differs between keys', () => {

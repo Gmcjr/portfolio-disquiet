@@ -68,6 +68,21 @@ export const SHADER_SCENES = [
   'rings',
 ] as const;
 export type ShaderScene = (typeof SHADER_SCENES)[number];
+/**
+ * Hydra-style ops on the shader image (ADR-0008 Amendment 5), named after Hydra's
+ * functions. osc and shape add a layer; the others move the image coordinates.
+ */
+export const HYDRA_OPS = [
+  'osc',
+  'shape',
+  'rotate',
+  'scale',
+  'repeat',
+  'modulate',
+  'pixelate',
+] as const;
+export type HydraOp = (typeof HYDRA_OPS)[number];
+export const MAX_CHAIN = 3;
 /** The p5 image (ethereal mood). */
 export const P5_SCENES = ['strokes', 'orbits', 'aurora'] as const;
 export type P5Scene = (typeof P5_SCENES)[number];
@@ -93,6 +108,8 @@ export interface VisualSetup {
   mood: Mood;
   shaderScene: ShaderScene;
   p5Scene: P5Scene;
+  /** 1 – MAX_CHAIN distinct ops, in the order they apply. */
+  chain: readonly HydraOp[];
 }
 
 export type Motion = 'full' | 'reduced' | 'paused';

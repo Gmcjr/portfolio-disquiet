@@ -95,6 +95,24 @@ The user asked for more atmosphere, ambience, and texture, in sound and in image
    only with the image clock, so reduced motion still holds the image. The shader now applies
    the core no-saturated-red test (`isSaturatedRed`) to every pixel.
 
+## Amendment 5 (2026-10-19, user decision: a Hydra-style image engine)
+
+The user asked about Hydra (hydra.ojack.xyz) and chose an own engine in the Hydra style.
+
+1. **The engine.** The shader image gets Hydra-like op chains (`osc`, `shape`, `rotate`,
+   `scale`, `repeat`, `modulate`, `pixelate`) on top of the existing scenes, and feedback:
+   each frame feeds into the next. The key picks the chain. The mood sets the feedback style
+   (psychedelic: zoom-and-rotate echoes; glitchy: stepped displacement). Ethereal stays on p5.
+2. **Still visitor-made.** Stillness makes the feedback stronger, turbulence sets the
+   modulation, scroll shifts the feedback, and speed sets the op speed.
+3. **Safety.** The feedback is a weighted mix with decay below 1, so brightness cannot build
+   up. Ops that flicker from frame to frame (inversion, difference, luma key) and a hue rotation
+   that adds up in the loop are excluded. A localhost probe measures flashes per region.
+4. **Later:** the user's own images and recorded sounds, manipulated by the engines. The engine
+   gets one texture input now (the previous frame); images can feed it later.
+   **DECISION NEEDED (user):** the images and sounds, with the samples item in Amendment 3.
+   They need the same ADR-0009 network change, a media budget, and a licence for each file.
+
 ## Source spec
 
 The user's raw note, `docs/notes/experience-raw-note.md`, is the spec. Read it in full before
@@ -252,6 +270,10 @@ their input, so the welcome page states the facts before the button.
 5. The user tests the first Enter on an iPhone, listens to the whole piece, and approves it.
 
 ## Alternatives rejected
+
+- **The `hydra-synth` library** (2026-10-19, measured at 1.4.0): AGPL-3.0; it calls
+  `globalThis.eval` when it is constructed (`src/lib/sandbox.js`), which the CSP blocks; it
+  asks for the microphone by default; 58.7 KB gzip. The user chose an own Hydra-style engine.
 
 - **Draft 2, seed-driven.** It ignored the visitor's input.
 - **IP address and cookie as the seed.** It conflicts with CONTEXT §5.

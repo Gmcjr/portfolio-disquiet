@@ -333,3 +333,23 @@ Follow the steps in order. A step is done only when its verification passes.
   pixel failed the red test (the random visits may not have hit a red hue). Frame rates in
   headless Chrome: shader 47–60 fps, p5 32–50 fps. Not yet measured on an iPhone. Next: the
   user listens.
+- 2026-10-19 — User asked about Hydra and about adding their own images and recorded sounds
+  later. Measured `hydra-synth` 1.4.0 (AGPL-3.0, `eval` at construction, microphone on by
+  default, 58.7 KB gzip). User decision: an own Hydra-style engine with feedback (ADR-0008
+  Amendment 5, ADR-0009 Amendment 4). WIP commit `a19aff70` (local, no push) first.
+  DECISION NEEDED (user): the user's images and recorded sounds (with the samples item).
+- 2026-10-19 — Hydra-style engine built (uncommitted): 7 ops (`osc`, `shape`, `rotate`,
+  `scale`, `repeat`, `modulate`, `pixelate`), 1–3 per visit from the key, on top of the 5
+  scenes; feedback in two passes (ping-pong framebuffers; atmosphere, dim, and red guard in the
+  screen pass only); `highp` where the GPU has it; the image clock wraps at 2000. New tests: the
+  chain pick (core) and the flash counter (a 10 Hz flicker counts, a slow fade does not). Gate
+  passes; Goodbye download 79.3 KB / 100 KB. Browser, under the `vercel.json` headers: all 7 ops
+  and 2 chains of 3 loaded with no compile error and no page error; flash probe (`?probe=1`) at
+  most 1 flash in any 1 s window (limit 3), with real frame reads (mean luminance about 0.22);
+  1280 × 720 at 52–60 fps with the probe off; reduced motion redraws about every 4 s. Contact
+  sheet checked: each op looks different. Not yet checked on an iPhone (precision, speed).
+- 2026-10-19 — PAUSED (user decision): the sound and image work (moods, banks, atmosphere,
+  Hydra-style engine) is WIP on branch `step6-engine-proto`. The user returns to it later
+  for listening and tuning; open items: new moods, the user's images and recorded sounds
+  (needs the ADR-0009 network change), the message words, and the iPhone check. The user wants
+  to move on with the remaining steps now.

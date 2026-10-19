@@ -6,13 +6,16 @@ import { createPRNG } from './key.js';
 import {
   AIRS,
   BEDS,
+  HYDRA_OPS,
   LEADS,
+  MAX_CHAIN,
   MOODS,
   P5_SCENES,
   PERCUSSION,
   SHADER_SCENES,
   type Air,
   type Bed,
+  type HydraOp,
   type Lead,
   type Mood,
   type P5Scene,
@@ -65,6 +68,8 @@ export interface Backdrop {
   air: Air;
   shaderScene: ShaderScene;
   p5Scene: P5Scene;
+  /** backdrop-chain: the Hydra-style ops on the shader image (Amendment 5). */
+  chain: readonly HydraOp[];
   /** Row long-stillness: one breath cycle, 6–10 s (user decision). */
   breathMs: number;
   /** Row page-dwell: time between new voices, 15–30 s (user decision). */
@@ -78,6 +83,18 @@ const pick = <T>(items: readonly T[], rand: () => number, fallback: T): T =>
 
 const between = (rand: () => number, min: number, max: number): number =>
   Math.round(min + rand() * (max - min));
+
+/** 1 – MAX_CHAIN distinct ops, from their own stream of the key. */
+function pickChain(rand: () => number): HydraOp[] {
+  const length = 1 + Math.floor(rand() * MAX_CHAIN);
+  const left = [...HYDRA_OPS];
+  const chain: HydraOp[] = [];
+  while (chain.length < length && left.length > 0) {
+    const [op] = left.splice(Math.floor(rand() * left.length), 1);
+    if (op !== undefined) chain.push(op);
+  }
+  return chain;
+}
 
 export function deriveBackdrop(key: string): Backdrop {
   const a = createPRNG(key.slice(0, 16));
@@ -112,6 +129,7 @@ export function deriveBackdrop(key: string): Backdrop {
     air: pick(AIRS, banks, 'hush'),
     shaderScene: pick(SHADER_SCENES, banks, 'waves'),
     p5Scene: pick(P5_SCENES, banks, 'strokes'),
+    chain: pickChain(createPRNG(key.slice(40, 56))),
   };
 }
 

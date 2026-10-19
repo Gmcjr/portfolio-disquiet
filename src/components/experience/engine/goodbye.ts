@@ -9,8 +9,10 @@ import { createPRNG } from '../../../lib/experience/key';
 import {
   AIRS,
   BEDS,
+  HYDRA_OPS,
   LEADS,
   limitBright,
+  MAX_CHAIN,
   MOODS,
   neutralFrame,
   P5_SCENES,
@@ -111,7 +113,8 @@ export async function playGoodbye(
 
   // Engines, by mood and bank (ADR-0008 Amendments 2 and 3). On localhost only,
   // ?mood=, ?scene=, ?lead=, ?bed=, ?percussion=, and ?air= override the key, for
-  // testing. The ethereal image loads p5 as a separate download.
+  // testing; ?ops= sets the Hydra-style chain, and ?probe=1 counts flashes.
+  // The ethereal image loads p5 as a separate download.
   const local = ['localhost', '127.0.0.1'].includes(window.location.hostname);
   const query = new URLSearchParams(local ? window.location.search : '');
   const asked = <T extends string>(
@@ -119,6 +122,11 @@ export async function playGoodbye(
     list: readonly T[],
   ): T | null => list.find((item) => item === query.get(name)) ?? null;
   const mood = asked('mood', MOODS);
+  const askedOps = (query.get('ops') ?? '')
+    .split(',')
+    .flatMap((name) => HYDRA_OPS.filter((op) => op === name))
+    .slice(0, MAX_CHAIN);
+  const askedChain = askedOps.length > 0 ? askedOps : null;
   const visualMood = mood ?? backdrop.visualMood;
   const audioMood = mood ?? backdrop.audioMood;
   const host = layer.querySelector<HTMLElement>('[data-exp-canvas-host]');
@@ -128,6 +136,7 @@ export async function playGoodbye(
     mood: visualMood,
     shaderScene: asked('scene', SHADER_SCENES) ?? backdrop.shaderScene,
     p5Scene: asked('scene', P5_SCENES) ?? backdrop.p5Scene,
+    chain: askedChain ?? backdrop.chain,
   };
   const audioSetup: AudioSetup = {
     rootMidi: backdrop.rootMidi,
@@ -171,8 +180,21 @@ export async function playGoodbye(
     }
   }
   if (visual === null && visualMood !== 'ethereal') {
-    visual = createShaderVisualEngine(mountCanvas(host), visualSetup);
-    if (visual !== null) loaded.push(`shader:${visualSetup.shaderScene}`);
+    visual = createShaderVisualEngine({
+      canvas: mountCanvas(host),
+      setup: visualSetup,
+      onError: (log) => loaded.push(`shader-error:${log.slice(0, 200)}`),
+      probe:
+        query.get('probe') === '1'
+          ? (flashes, mean) => {
+              layer.dataset.expFlash = `${flashes} mean:${mean.toFixed(3)}`;
+            }
+          : null,
+    });
+    if (visual !== null) {
+      const { shaderScene, chain } = visualSetup;
+      loaded.push(`shader:${shaderScene}:${chain.join('+')}`);
+    }
   }
   if (visual === null) {
     visual = canvasEngine(mountCanvas(host));

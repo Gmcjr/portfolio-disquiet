@@ -49,7 +49,16 @@ approved these runtime changes on 2026-10-18:
   key. The layer then shows the engines that really loaded in `data-exp-loaded`, so a browser
   check can see a silent fallback.
 
-## Context
+## Amendment 4 (2026-10-19) — follows ADR-0008 Amendment 5
+
+- Core `params.ts` defines the op vocabulary (`HYDRA_OPS`) and the chain length limit;
+  `backdrop.ts` picks the chain from its own slice of the key.
+- The shader engine builds its GLSL from the chain at the Goodbye click, from the fixed
+  vocabulary only. This is shader compilation, not JS `eval`, so the CSP does not change.
+- The shader engine draws in two passes: pass A draws the chain with feedback into ping-pong
+  framebuffers; pass B draws the result with the atmosphere, `dim`, and the red guard.
+- On localhost only: `?ops=` overrides the chain; `data-exp-loaded` shows the chain or the
+  shader compile error; `data-exp-flash` shows the measured flash count.
 
 ADR-0008 sets what the experience does. This ADR sets how the code is built. The forces:
 
