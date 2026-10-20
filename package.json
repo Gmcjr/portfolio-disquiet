@@ -21,31 +21,31 @@
     "check:size": "bun scripts/check-bundle-size.ts"
   },
   "dependencies": {
-    "@astrojs/mdx": "8.0.1",
+    "@astrojs/mdx": "8.1.0",
     "@astrojs/sitemap": "3.7.4",
     "@fontsource-variable/jetbrains-mono": "5.3.0",
     "@fontsource/kumar-one-outline": "5.3.0",
     "@fontsource/lekton": "5.3.0",
     "@tailwindcss/vite": "4.3.3",
-    "astro": "7.3.2",
-    "resend": "6.28.0",
+    "astro": "7.4.1",
+    "resend": "6.34.1",
     "tailwindcss": "4.3.3",
-    "zod": "4.6.4"
+    "zod": "4.6.7"
   },
   "devDependencies": {
-    "@astrojs/check": "0.9.10",
+    "@astrojs/check": "0.9.11",
     "@eslint/js": "10.0.1",
     "@lhci/cli": "0.15.1",
-    "dependency-cruiser": "18.3.0",
-    "eslint": "10.10.0",
+    "dependency-cruiser": "18.7.0",
+    "eslint": "10.13.0",
     "eslint-config-prettier": "10.1.8",
-    "eslint-plugin-astro": "3.1.0",
-    "jsdom": "30.0.1",
-    "lefthook": "2.1.12",
-    "prettier": "3.9.6",
-    "prettier-plugin-astro": "1.0.0",
+    "eslint-plugin-astro": "3.2.1",
+    "jsdom": "30.1.3",
+    "lefthook": "2.2.2",
+    "prettier": "3.9.10",
+    "prettier-plugin-astro": "1.1.1",
     "typescript": "6.0.3",
-    "typescript-eslint": "8.70.0",
-    "vitest": "5.0.0"
+    "typescript-eslint": "8.72.0",
+    "vitest": "5.0.5"
   }
 }
