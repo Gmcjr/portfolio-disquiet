@@ -25,7 +25,7 @@ No database. No other external services in v1.
 
 ## 3. Solution strategy
 
-Astro 7.3.2, static output, no adapter — every page is prerendered HTML at build time, served
+Astro 7.4.1, static output, no adapter — every page is prerendered HTML at build time, served
 from Vercel's CDN with no per‑request server work. React is not part of the runtime in v1: the
 one interactive element (the contact form) is vanilla TypeScript. See ADR-0001 and ADR-0007.
 
